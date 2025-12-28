@@ -4,7 +4,48 @@ import { getPrompt } from './ui/prompt.js';
 import { parseAndExecute } from './cli.js';
 import { theme } from './ui/colors.js';
 import { getAllCommands } from './commands/registry.js';
-import { readdirSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// Handle --version and --help flags before anything else
+const args = process.argv.slice(2);
+
+if (args.includes('--version') || args.includes('-v')) {
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const pkgPath = join(__dirname, '..', 'package.json');
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+    console.log(`zammy v${pkg.version}`);
+  } catch {
+    console.log('zammy v1.0.0');
+  }
+  process.exit(0);
+}
+
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(`
+zammy - Your slice-of-life terminal companion
+
+Usage: zammy [options]
+
+Options:
+  -v, --version    Show version number
+  -h, --help       Show this help message
+  --simple         Force simple mode (no interactive features)
+
+Commands:
+  Start zammy and type / to see all available commands
+  Type ! for enhanced shell commands
+
+Examples:
+  zammy              Start interactive shell
+  zammy --simple     Start in simple mode (for non-TTY terminals)
+  zammy --version    Show version
+`);
+  process.exit(0);
+}
 
 // Detect if we're in a proper TTY environment
 const isTTY = process.stdin.isTTY && process.stdout.isTTY;

@@ -760,7 +760,34 @@ function handleGit(args: string): void {
   console.log('');
 }
 
-// Clipboard operations
+// Clipboard operations - cross-platform
+const isMac = platform() === 'darwin';
+const isLinux = platform() === 'linux';
+
+function getClipboardCopyCmd(): string {
+  if (isWindows) return 'clip';
+  if (isMac) return 'pbcopy';
+  // Linux - try xclip first, fall back to xsel
+  try {
+    execSync('which xclip', { stdio: 'pipe' });
+    return 'xclip -selection clipboard';
+  } catch {
+    return 'xsel --clipboard --input';
+  }
+}
+
+function getClipboardPasteCmd(): string {
+  if (isWindows) return 'powershell -command "Get-Clipboard"';
+  if (isMac) return 'pbpaste';
+  // Linux
+  try {
+    execSync('which xclip', { stdio: 'pipe' });
+    return 'xclip -selection clipboard -o';
+  } catch {
+    return 'xsel --clipboard --output';
+  }
+}
+
 function handleClipboard(args: string): void {
   const parts = args.trim().split(/\s+/);
   const action = parts[0]?.toLowerCase();
@@ -770,42 +797,49 @@ function handleClipboard(args: string): void {
 
   if (action === 'copy' && content) {
     try {
+      const copyCmd = getClipboardCopyCmd();
       if (isWindows) {
-        execSync(`echo ${content} | clip`, { stdio: 'pipe', timeout: 3000 });
+        execSync(`echo ${content} | ${copyCmd}`, { stdio: 'pipe', timeout: 3000 });
       } else {
-        execSync(`echo "${content}" | pbcopy`, { stdio: 'pipe', timeout: 3000 });
+        execSync(`echo "${content}" | ${copyCmd}`, { stdio: 'pipe', timeout: 3000 });
       }
       console.log(`  ${symbols.check} ${theme.success('Copied to clipboard')}`);
     } catch {
       console.log(theme.error('  Failed to copy to clipboard'));
+      if (isLinux) {
+        console.log(theme.dim('  (Install xclip or xsel: sudo apt install xclip)'));
+      }
     }
   } else if (action === 'paste') {
     try {
-      let result: string;
-      if (isWindows) {
-        result = execSync('powershell -command "Get-Clipboard"', { encoding: 'utf-8', timeout: 3000 }).trim();
-      } else {
-        result = execSync('pbpaste', { encoding: 'utf-8', timeout: 3000 });
-      }
+      const pasteCmd = getClipboardPasteCmd();
+      const result = execSync(pasteCmd, { encoding: 'utf-8', timeout: 3000 }).trim();
       console.log(`  ${symbols.clipboard} ${theme.dim('Clipboard contents:')}`);
       console.log('');
       console.log(result);
     } catch {
       console.log(theme.error('  Failed to read clipboard'));
+      if (isLinux) {
+        console.log(theme.dim('  (Install xclip or xsel: sudo apt install xclip)'));
+      }
     }
   } else if (action === 'file' && parts[1]) {
     // Copy file contents to clipboard
     const filePath = resolve(process.cwd(), parts[1]);
     if (existsSync(filePath)) {
       try {
+        const copyCmd = getClipboardCopyCmd();
         if (isWindows) {
-          execSync(`type "${filePath}" | clip`, { stdio: 'pipe', timeout: 5000 });
+          execSync(`type "${filePath}" | ${copyCmd}`, { stdio: 'pipe', timeout: 5000 });
         } else {
-          execSync(`cat "${filePath}" | pbcopy`, { stdio: 'pipe', timeout: 5000 });
+          execSync(`cat "${filePath}" | ${copyCmd}`, { stdio: 'pipe', timeout: 5000 });
         }
         console.log(`  ${symbols.check} ${theme.success('File contents copied to clipboard')}`);
       } catch {
         console.log(theme.error('  Failed to copy file to clipboard'));
+        if (isLinux) {
+          console.log(theme.dim('  (Install xclip or xsel: sudo apt install xclip)'));
+        }
       }
     } else {
       console.log(theme.error(`  File not found: ${parts[1]}`));
@@ -816,6 +850,10 @@ function handleClipboard(args: string): void {
     console.log(`  ${theme.dim('clipboard copy <text>')}  ${theme.dim('-')} Copy text to clipboard`);
     console.log(`  ${theme.dim('clipboard paste')}        ${theme.dim('-')} Show clipboard contents`);
     console.log(`  ${theme.dim('clipboard file <path>')}  ${theme.dim('-')} Copy file contents to clipboard`);
+    if (isLinux) {
+      console.log('');
+      console.log(theme.dim('  Note: Requires xclip or xsel on Linux'));
+    }
   }
 
   console.log('');
@@ -1075,10 +1113,20 @@ function handleIp(): void {
     console.log('');
     console.log(theme.dim('  Public IP:'));
     try {
-      const result = execSync('curl -s ifconfig.me', { encoding: 'utf-8', timeout: 5000 }).trim();
+      // Try curl first, then PowerShell on Windows
+      let result: string;
+      try {
+        result = execSync('curl -s ifconfig.me', { encoding: 'utf-8', timeout: 5000 }).trim();
+      } catch {
+        if (isWindows) {
+          result = execSync('powershell -command "(Invoke-WebRequest -Uri ifconfig.me -UseBasicParsing).Content"', { encoding: 'utf-8', timeout: 5000 }).trim();
+        } else {
+          throw new Error('curl not available');
+        }
+      }
       console.log(`    ${chalk.hex('#61AFEF')(result)}`);
     } catch {
-      console.log(`    ${theme.dim('(Could not fetch - requires internet)')}`);
+      console.log(`    ${theme.dim('(Could not fetch - requires curl or internet)')}`);
     }
   } catch (error) {
     console.log(theme.error('  Failed to get network info'));
@@ -1150,11 +1198,26 @@ async function handleHttp(args: string): Promise<void> {
   console.log('');
 
   try {
-    const curlCmd = method === 'HEAD'
-      ? `curl -sI "${fullUrl}"`
-      : `curl -s -X ${method} "${fullUrl}"`;
+    let result: string;
 
-    const result = execSync(curlCmd, { encoding: 'utf-8', timeout: 10000 });
+    // Try curl first
+    try {
+      const curlCmd = method === 'HEAD'
+        ? `curl -sI "${fullUrl}"`
+        : `curl -s -X ${method} "${fullUrl}"`;
+      result = execSync(curlCmd, { encoding: 'utf-8', timeout: 10000 });
+    } catch {
+      // Fallback to PowerShell on Windows
+      if (isWindows) {
+        if (method === 'HEAD') {
+          result = execSync(`powershell -command "(Invoke-WebRequest -Uri '${fullUrl}' -Method Head -UseBasicParsing).Headers | ConvertTo-Json"`, { encoding: 'utf-8', timeout: 10000 });
+        } else {
+          result = execSync(`powershell -command "(Invoke-WebRequest -Uri '${fullUrl}' -Method ${method} -UseBasicParsing).Content"`, { encoding: 'utf-8', timeout: 10000 });
+        }
+      } else {
+        throw new Error('curl not available');
+      }
+    }
 
     if (result.trim().startsWith('{') || result.trim().startsWith('[')) {
       // JSON response - pretty print
