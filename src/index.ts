@@ -7,6 +7,130 @@ import { getAllCommands } from './commands/registry.js';
 import { readdirSync, readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import chalk from 'chalk';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// IDLE ANIMATION - Mini slime that blinks
+// ═══════════════════════════════════════════════════════════════════════════
+const SLIME_COLOR = '#9B59B6';
+const EYE_COLOR = '#1A1A2E';
+
+// Terminal width thresholds
+const MIN_WIDTH_FOR_IDLE = 40;  // Min width for idle animation
+const MIN_WIDTH_FOR_MENU = 50;  // Min width for command menu
+
+const miniSlimeFrames = [
+  // Open eyes
+  chalk.hex(SLIME_COLOR)('(') + chalk.hex(EYE_COLOR)('●') + chalk.hex(SLIME_COLOR)('ᴗ') + chalk.hex(EYE_COLOR)('●') + chalk.hex(SLIME_COLOR)(')'),
+  // Blink (closed eyes)
+  chalk.hex(SLIME_COLOR)('(') + chalk.hex(EYE_COLOR)('─') + chalk.hex(SLIME_COLOR)('ᴗ') + chalk.hex(EYE_COLOR)('─') + chalk.hex(SLIME_COLOR)(')'),
+];
+
+// Animation state
+let idleAnimationInterval: NodeJS.Timeout | null = null;
+let isUserTyping = false;
+let lastActivityTime = Date.now();
+let lastRenderedFrame = -1;
+let slimeVisible = false;
+let lastTermWidth = process.stdout.columns || 80;
+const IDLE_DELAY = 3000; // Start animating after 3s of inactivity
+const FRAME_INTERVAL = 2000; // Blink every 2 seconds
+
+// Blink sequence - mostly open with occasional blink
+const animationSequence = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0];
+let sequenceIndex = 0;
+
+function getAnimatedSlime(): { frame: string; index: number } {
+  const frameIndex = animationSequence[sequenceIndex % animationSequence.length];
+  return { frame: miniSlimeFrames[frameIndex], index: frameIndex };
+}
+
+function updateIdleAnimation(rl: readline.Interface): void {
+  const termWidth = process.stdout.columns || 80;
+
+  // If user started typing, menu visible, or terminal too narrow, clear slime and exit
+  if (isUserTyping || menu.visible || termWidth < MIN_WIDTH_FOR_IDLE) {
+    if (slimeVisible) {
+      clearIdleSlime(rl);
+    }
+    return;
+  }
+
+  const now = Date.now();
+  if (now - lastActivityTime < IDLE_DELAY) return;
+
+  const currentLine = (rl as any).line || '';
+
+  // Only update if line is empty (user not typing)
+  if (currentLine.length !== 0) return;
+
+  sequenceIndex++;
+  const { frame: slime, index: frameIndex } = getAnimatedSlime();
+
+  // Skip if frame hasn't changed
+  if (frameIndex === lastRenderedFrame && slimeVisible) return;
+  lastRenderedFrame = frameIndex;
+  slimeVisible = true;
+
+  const promptLen = getPromptLength();
+  const slimePos = Math.max(promptLen + 3, termWidth - 12);
+
+  // Hide cursor, draw slime, restore cursor position, show cursor
+  process.stdout.write(
+    '\x1b[?25l' +                // Hide cursor
+    `\x1b[${slimePos}G` +        // Move to slime position
+    '\x1b[K' +                   // Clear to end of line
+    slime +                      // Draw slime
+    `\x1b[${promptLen + 1}G` +   // Move back to prompt position
+    '\x1b[?25h'                  // Show cursor
+  );
+}
+
+function startIdleAnimation(rl: readline.Interface): void {
+  if (idleAnimationInterval) return;
+
+  idleAnimationInterval = setInterval(() => {
+    updateIdleAnimation(rl);
+  }, FRAME_INTERVAL);
+}
+
+function stopIdleAnimation(): void {
+  if (idleAnimationInterval) {
+    clearInterval(idleAnimationInterval);
+    idleAnimationInterval = null;
+  }
+}
+
+function clearIdleSlime(rl?: readline.Interface): void {
+  if (!slimeVisible) return;
+  slimeVisible = false;
+  lastRenderedFrame = -1;
+
+  const termWidth = process.stdout.columns || 80;
+  const slimePos = termWidth - 12;
+  const promptLen = getPromptLength();
+  const currentLine = rl ? ((rl as any).line || '') : '';
+  const cursorPos = promptLen + currentLine.length + 1;
+
+  // Hide cursor, clear slime, restore cursor position, show cursor
+  process.stdout.write(
+    '\x1b[?25l' +                // Hide cursor
+    `\x1b[${slimePos}G\x1b[K` +  // Clear slime area
+    `\x1b[${cursorPos}G` +       // Move to user's cursor position
+    '\x1b[?25h'                  // Show cursor
+  );
+}
+
+function resetIdleTimer(rl?: readline.Interface): void {
+  lastActivityTime = Date.now();
+  isUserTyping = true;
+  clearIdleSlime(rl);
+}
+
+function setIdle(): void {
+  isUserTyping = false;
+  lastActivityTime = Date.now();
+}
 
 // Handle --version and --help flags before anything else
 const args = process.argv.slice(2);
@@ -33,7 +157,8 @@ Usage: zammy [options]
 Options:
   -v, --version    Show version number
   -h, --help       Show this help message
-  --simple         Force simple mode (no interactive features)
+  --simple         Force simple mode (no animations)
+  --no-menu        Disable interactive command menu
 
 Commands:
   Start zammy and type / to see all available commands
@@ -50,6 +175,7 @@ Examples:
 // Detect if we're in a proper TTY environment
 const isTTY = process.stdin.isTTY && process.stdout.isTTY;
 const isSimpleMode = process.argv.includes('--simple') || !isTTY;
+const noMenu = process.argv.includes('--no-menu');
 
 // Import commands to register them
 import './commands/index.js';
@@ -226,6 +352,14 @@ function hideMenu(currentLine: string = ''): void {
 }
 
 function showMenu(filter: string, prefix: '/' | '!', currentLine: string): void {
+  const termWidth = process.stdout.columns || 80;
+
+  // Don't show menu if terminal is too narrow
+  if (termWidth < MIN_WIDTH_FOR_MENU) {
+    if (menu.visible) hideMenu(currentLine);
+    return;
+  }
+
   const allItems = prefix === '/' ? getFilteredCommands(filter) : getFilteredShellCommands(filter);
 
   if (allItems.length === 0) {
@@ -356,7 +490,7 @@ async function main() {
     console.log(theme.dim('For full features, run in a proper terminal or use: zammy --simple\n'));
   }
 
-  await displayBanner();
+  await displayBanner(isSimpleMode);
 
   const rl = readline.createInterface({
     input: process.stdin,
@@ -368,10 +502,42 @@ async function main() {
   // Track previous line to detect changes
   let prevLine = '';
 
-  // Enable interactive menu in TTY mode
+  // Enable idle animation in TTY mode (not in simple mode)
   if (isTTY && !isSimpleMode) {
+    startIdleAnimation(rl);
+  }
+
+  // Handle terminal resize events
+  if (isTTY) {
+    process.stdout.on('resize', () => {
+      const currentLine = (rl as any).line || '';
+      const newWidth = process.stdout.columns || 80;
+
+      // Hide menu and clear idle slime on resize to prevent visual glitches
+      if (menu.visible) {
+        hideMenu(currentLine);
+      }
+      if (slimeVisible) {
+        clearIdleSlime(rl);
+      }
+
+      // Redraw prompt cleanly
+      process.stdout.write('\r' + getPrompt() + currentLine);
+
+      lastTermWidth = newWidth;
+    });
+  }
+
+  // Enable interactive menu in TTY mode (unless --no-menu is passed)
+  if (isTTY && !noMenu) {
     process.stdin.on('keypress', (_char, key) => {
       if (!key) return;
+
+      // Mark as typing for idle animation (only matters if animation is running)
+      if (!isSimpleMode) {
+        isUserTyping = true;
+        lastActivityTime = Date.now();
+      }
 
       const currentLine = (rl as any).line || '';
 
@@ -418,6 +584,7 @@ async function main() {
 
     if (now - lastCtrlC < 500) {
       hideMenu(line);
+      stopIdleAnimation();
       console.log('\n' + theme.secondary('Goodbye! See you next time.') + '\n');
       process.exit(0);
     } else {
@@ -434,6 +601,7 @@ async function main() {
     hideMenu(input);
     prevLine = '';
     await parseAndExecute(input);
+    if (!isSimpleMode) setIdle();
     rl.prompt();
   });
 

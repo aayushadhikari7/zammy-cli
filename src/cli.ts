@@ -1,6 +1,7 @@
 import { getCommand } from './commands/index.js';
 import { theme, symbols, progressBar } from './ui/colors.js';
 import { displayBanner } from './ui/banner.js';
+import { miniSlime, showMascot, getRandomMood, react, getMoodFromText } from './ui/slime-animated.js';
 import { exec, execSync, spawn } from 'child_process';
 import { existsSync, statSync, readFileSync, readdirSync, writeFileSync, watchFile, unwatchFile } from 'fs';
 import { resolve, extname, basename, join } from 'path';
@@ -101,20 +102,20 @@ function handleCd(args: string): void {
   }
 
   if (!existsSync(targetPath)) {
-    console.log(theme.error(`Directory not found: ${targetPath}`));
+    console.log(`${miniSlime.sad} ${theme.error(`Directory not found: ${targetPath}`)}`);
     return;
   }
 
   try {
     const stats = statSync(targetPath);
     if (!stats.isDirectory()) {
-      console.log(theme.error(`Not a directory: ${targetPath}`));
+      console.log(`${miniSlime.sad} ${theme.error(`Not a directory: ${targetPath}`)}`);
       return;
     }
     process.chdir(targetPath);
     console.log(theme.dim(process.cwd()));
   } catch (error) {
-    console.log(theme.error(`Cannot access: ${targetPath}`));
+    console.log(`${miniSlime.sad} ${theme.error(`Cannot access: ${targetPath}`)}`);
   }
 }
 
@@ -128,7 +129,7 @@ function handleCat(args: string): void {
   const filePath = resolve(process.cwd(), args.trim());
 
   if (!existsSync(filePath)) {
-    console.log(theme.error(`File not found: ${args}`));
+    console.log(`${miniSlime.sad} ${theme.error(`File not found: ${args}`)}`);
     return;
   }
 
@@ -143,7 +144,7 @@ function handleCat(args: string): void {
       console.log(content);
     }
   } catch (error) {
-    console.log(theme.error(`Cannot read file: ${args}`));
+    console.log(`${miniSlime.sad} ${theme.error(`Cannot read file: ${args}`)}`);
   }
 }
 
@@ -396,27 +397,27 @@ function handleBookmark(args: string): void {
     case 'save':
     case 'add':
       if (!name) {
-        console.log(theme.error('  Usage: bookmark save <name>'));
+        console.log(`  ${miniSlime.thinking} ${theme.error('Usage: bookmark save <name>')}`);
         break;
       }
       bookmarks[name] = process.cwd();
       saveBookmarks(bookmarks);
-      console.log(`  ${symbols.check} ${theme.success('Saved bookmark:')} ${theme.primary(name)} ${theme.dim('→')} ${process.cwd()}`);
+      console.log(`  ${miniSlime.happy} ${theme.success('Saved bookmark:')} ${theme.primary(name)} ${theme.dim('→')} ${process.cwd()}`);
       break;
 
     case 'go':
     case 'cd':
       if (!name || !bookmarks[name]) {
-        console.log(theme.error(`  Bookmark not found: ${name}`));
+        console.log(`  ${miniSlime.sad} ${theme.error(`Bookmark not found: ${name}`)}`);
         console.log(theme.dim('  Use "bookmark list" to see all bookmarks'));
         break;
       }
       try {
         process.chdir(bookmarks[name]);
-        console.log(`  ${symbols.check} ${theme.dim('Jumped to')} ${theme.primary(name)}`);
+        console.log(`  ${miniSlime.excited} ${theme.dim('Jumped to')} ${theme.primary(name)}`);
         console.log(`  ${theme.dim(process.cwd())}`);
       } catch {
-        console.log(theme.error(`  Cannot access: ${bookmarks[name]}`));
+        console.log(`  ${miniSlime.sad} ${theme.error(`Cannot access: ${bookmarks[name]}`)}`);
       }
       break;
 
@@ -424,12 +425,12 @@ function handleBookmark(args: string): void {
     case 'delete':
     case 'rm':
       if (!name || !bookmarks[name]) {
-        console.log(theme.error(`  Bookmark not found: ${name}`));
+        console.log(`  ${miniSlime.sad} ${theme.error(`Bookmark not found: ${name}`)}`);
         break;
       }
       delete bookmarks[name];
       saveBookmarks(bookmarks);
-      console.log(`  ${symbols.check} ${theme.success('Deleted bookmark:')} ${theme.primary(name)}`);
+      console.log(`  ${miniSlime.happy} ${theme.success('Deleted bookmark:')} ${theme.primary(name)}`);
       break;
 
     case 'list':
@@ -1630,8 +1631,10 @@ async function executeShellCommand(command: string): Promise<void> {
   }
 
   if (cmd === 'clear' || cmd === 'cls') {
-    console.clear();
-    await displayBanner();
+    // Full terminal reset - clear screen and scrollback buffer
+    process.stdout.write('\x1b[2J\x1b[3J\x1b[H');
+    const isSimple = process.argv.includes('--simple') || !process.stdout.isTTY;
+    await displayBanner(isSimple);
     return;
   }
 
@@ -1775,6 +1778,33 @@ export async function parseAndExecute(input: string): Promise<void> {
 
   // Check if it's a command (starts with /)
   if (!trimmed.startsWith('/')) {
+    // Check for keyword-based mood reactions
+    const detectedMood = getMoodFromText(trimmed);
+    if (detectedMood) {
+      console.log('');
+      const responses: Record<string, string[]> = {
+        love: ["Aww, you're sweet!", "Right back at ya!", "*happy wobble*"],
+        excited: ["Yay! Let's gooo!", "Woohoo!", "*bounces excitedly*"],
+        sleepy: ["*yawns* Same...", "Maybe take a break?", "zzZ..."],
+        sad: ["Aww, it's okay!", "I'm here for you!", "*comforting wobble*"],
+        angry: ["*hides nervously*", "Let's fix that!", "Deep breaths..."],
+        thinking: ["Hmm indeed...", "Let me think too...", "*ponders*"],
+      };
+      const moodResponses = responses[detectedMood] || ["*wobbles*"];
+      const response = moodResponses[Math.floor(Math.random() * moodResponses.length)];
+
+      // Love and excited: 50% chance for full mascot (only for short simple inputs)
+      const isSimpleInput = trimmed.length < 20 && !/[{}\[\]();=<>]/.test(trimmed);
+      if ((detectedMood === 'love' || detectedMood === 'excited') && isSimpleInput && Math.random() < 0.5) {
+        showMascot(detectedMood);
+        console.log(`  ${theme.secondary(response)}`);
+      } else {
+        react(detectedMood, theme.secondary(response));
+      }
+      console.log('');
+      return;
+    }
+
     console.log('');
     console.log(`  ${symbols.info} ${theme.dim('Commands start with')} ${theme.primary('/')} ${theme.dim('• Shell commands start with')} ${theme.primary('!')}`);
     console.log(`  ${theme.dim('   Type')} ${theme.primary('/help')} ${theme.dim('for available commands')}`);
@@ -1799,9 +1829,15 @@ export async function parseAndExecute(input: string): Promise<void> {
 
   try {
     await command.execute(args);
+    // Success reaction (occasional, not every time)
+    if (Math.random() < 0.15) {
+      const successMoods = ['happy', 'excited', 'wink'] as const;
+      const mood = successMoods[Math.floor(Math.random() * successMoods.length)];
+      react(mood);
+    }
   } catch (error) {
     console.log('');
-    console.log(`  ${symbols.cross} ${theme.error('Error:')} ${theme.dim(String(error))}`);
+    react('sad', theme.error(`Error: ${String(error)}`));
     console.log('');
   }
 }

@@ -2,7 +2,7 @@
 
 # Zammy CLI
 
-**A feature-packed CLI with utilities, dev tools, and a bit of fun**
+**Your friendly terminal companion with utilities, dev tools, and a purple slime mascot**
 
 [![Tests](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml/badge.svg)](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml)
 [![npm version](https://img.shields.io/npm/v/zammy.svg)](https://www.npmjs.com/package/zammy)
@@ -20,6 +20,8 @@
 ```
 
 A feature-packed CLI that combines utilities, dev tools, and a bit of fun into an interactive terminal experience.
+
+![Zammy CLI Screenshot](screenshot.png)
 
 [Features](#features) • [Installation](#installation) • [Commands](#commands) • [Contributing](#contributing)
 
@@ -47,13 +49,15 @@ A feature-packed CLI that combines utilities, dev tools, and a bit of fun into a
 
 ## Features
 
+- **Meet Zammy** — Your friendly CLI mascot! An animated purple slime that blinks and reacts to your mood
 - **Interactive Command Menu** — Type `/` to browse all commands with arrow key navigation
+- **Mood Reactions** — Type "thanks", "wow", or even ":(" and Zammy reacts with different emotions
 - **Tab Autocomplete** — Quick command completion with Tab key
 - **Enhanced Shell Commands** — Supercharged `!` commands with colors, icons, and extra features
 - **Beautiful ASCII Art** — Convert images to ASCII with multiple styles and edge detection
 - **Rich UI** — Colorful output, box drawings, gradients, and Unicode symbols
 - **Cross-Platform** — Works on Windows, macOS, and Linux
-- **Fully Tested** — Comprehensive test suite with 150+ unit tests
+- **Simple Mode** — Use `--simple` for terminals that don't support animations
 
 ## Installation
 
@@ -89,8 +93,14 @@ zammy
 # Check version
 zammy --version
 
-# Force simple mode (for non-TTY terminals)
+# Simple mode (no animations)
 zammy --simple
+
+# Disable interactive menu
+zammy --no-menu
+
+# Minimal mode (no animations, no menu)
+zammy --simple --no-menu
 ```
 
 Once inside Zammy:
@@ -124,6 +134,7 @@ zammy❯ /asciiart @img.png # Convert image to ASCII
 
 | Command | Description |
 |---------|-------------|
+| `/zammy [mood]` | Say hi to Zammy! Try: `happy`, `excited`, `love`, `sleepy`, `angry`, `moods` |
 | `/joke` | Get a random programming joke |
 | `/quote` | Get an inspirational quote |
 | `/fortune` | Get your fortune told (with lucky numbers!) |
@@ -233,6 +244,25 @@ Type `/` or `!` to open an interactive command menu:
 - **Escape** — Close menu
 - Type to filter commands
 
+### Zammy's Mood Reactions
+
+Zammy responds to your emotions! Just type naturally (without `/` or `!`):
+
+| Keywords | Zammy's Mood |
+|----------|--------------|
+| `thanks`, `love you`, `ty` | Shows love with hearts |
+| `wow`, `awesome`, `cool` | Gets excited with stars |
+| `tired`, `sleepy`, `zzz` | Yawns sleepily |
+| `:(`, `ugh`, `damn` | Reacts with frustration |
+| `sad`, `sorry`, `fail` | Shows sympathy |
+| `hmm`, `maybe`, `idk` | Thinks along with you |
+
+For `love` and `excited` moods, there's a 50% chance Zammy shows the full mascot!
+
+### Idle Animation
+
+When you're idle for a few seconds, a mini Zammy appears and blinks at you. Start typing and it disappears!
+
 ### Tab Completion
 
 ```bash
@@ -286,9 +316,10 @@ zammy-cli/
 │   │   ├── fun/          # Dice, flip, fortune logic
 │   │   └── creative/     # Lorem, color logic
 │   └── ui/               # UI components
-│       ├── banner.ts     # Welcome screen
+│       ├── banner.ts     # Welcome screen with animated mascot
 │       ├── colors.ts     # Theme, symbols
-│       └── prompt.ts     # CLI prompt
+│       ├── prompt.ts     # CLI prompt
+│       └── slime-animated.ts  # Zammy mascot moods & reactions
 ├── dist/                 # Compiled output
 └── package.json
 ```
