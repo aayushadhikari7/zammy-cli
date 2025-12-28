@@ -3,6 +3,7 @@
 > Your slice-of-life terminal companion
 
 <p align="center">
+  <a href="https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml"><img src="https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
   <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License">
@@ -38,7 +39,7 @@ Zammy is a delightful, feature-rich terminal companion built with TypeScript. It
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/zammy-cli.git
+git clone https://github.com/aayushadhikari7/zammy-cli.git
 cd zammy-cli
 
 # Install dependencies
