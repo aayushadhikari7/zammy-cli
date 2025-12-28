@@ -1,84 +1,36 @@
 import { registerCommand } from '../registry.js';
 import { theme, symbols } from '../../ui/colors.js';
-
-const diceArt: Record<number, string[]> = {
-  1: [
-    '┌─────────┐',
-    '│         │',
-    '│    ●    │',
-    '│         │',
-    '└─────────┘',
-  ],
-  2: [
-    '┌─────────┐',
-    '│  ●      │',
-    '│         │',
-    '│      ●  │',
-    '└─────────┘',
-  ],
-  3: [
-    '┌─────────┐',
-    '│  ●      │',
-    '│    ●    │',
-    '│      ●  │',
-    '└─────────┘',
-  ],
-  4: [
-    '┌─────────┐',
-    '│  ●   ●  │',
-    '│         │',
-    '│  ●   ●  │',
-    '└─────────┘',
-  ],
-  5: [
-    '┌─────────┐',
-    '│  ●   ●  │',
-    '│    ●    │',
-    '│  ●   ●  │',
-    '└─────────┘',
-  ],
-  6: [
-    '┌─────────┐',
-    '│  ●   ●  │',
-    '│  ●   ●  │',
-    '│  ●   ●  │',
-    '└─────────┘',
-  ],
-};
+import { rollDice, DICE_ART } from '../../handlers/fun/dice.js';
 
 registerCommand({
   name: 'dice',
   description: 'Roll some dice',
   usage: '/dice [count] [sides]',
   async execute(args: string[]) {
-    const count = Math.min(parseInt(args[0]) || 1, 6);
+    const count = parseInt(args[0]) || 1;
     const sides = parseInt(args[1]) || 6;
 
-    console.log('');
-    console.log(`  ${symbols.dice} ${theme.secondary('Rolling')} ${theme.primary(count.toString())}d${theme.primary(sides.toString())}...`);
-    console.log('');
+    const result = rollDice(count, sides);
 
-    const rolls: number[] = [];
-    for (let i = 0; i < count; i++) {
-      rolls.push(Math.floor(Math.random() * sides) + 1);
-    }
+    console.log('');
+    console.log(`  ${symbols.dice} ${theme.secondary('Rolling')} ${theme.primary(result.count.toString())}d${theme.primary(result.sides.toString())}...`);
+    console.log('');
 
     // Show ASCII art for standard d6
-    if (sides === 6 && count <= 3) {
+    if (result.isStandardD6) {
       // Display dice side by side
       for (let line = 0; line < 5; line++) {
-        const row = rolls.map(r => theme.primary(diceArt[r][line])).join('  ');
+        const row = result.rolls.map(r => theme.primary(DICE_ART[r][line])).join('  ');
         console.log('  ' + row);
       }
     } else {
       // Just show numbers for other dice
-      const diceDisplay = rolls.map(r => theme.gold(`[${r}]`)).join(' ');
+      const diceDisplay = result.rolls.map(r => theme.gold(`[${r}]`)).join(' ');
       console.log(`  ${diceDisplay}`);
     }
 
     console.log('');
-    const total = rolls.reduce((a, b) => a + b, 0);
-    console.log(`  ${theme.dim('Total:')} ${theme.success(total.toString())}`);
+    console.log(`  ${theme.dim('Total:')} ${theme.success(result.total.toString())}`);
     console.log('');
   },
 });

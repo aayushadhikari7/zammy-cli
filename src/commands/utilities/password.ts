@@ -1,47 +1,14 @@
 import { registerCommand } from '../registry.js';
 import { theme, symbols, box } from '../../ui/colors.js';
-import { randomBytes } from 'crypto';
+import { generatePassword, PasswordStrength } from '../../handlers/utilities/password.js';
 
-function generatePassword(length: number, options: { uppercase: boolean; lowercase: boolean; numbers: boolean; symbols: boolean }): string {
-  const charsets = {
-    uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    lowercase: 'abcdefghijklmnopqrstuvwxyz',
-    numbers: '0123456789',
-    symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?',
-  };
-
-  let chars = '';
-  if (options.uppercase) chars += charsets.uppercase;
-  if (options.lowercase) chars += charsets.lowercase;
-  if (options.numbers) chars += charsets.numbers;
-  if (options.symbols) chars += charsets.symbols;
-
-  if (!chars) chars = charsets.lowercase + charsets.numbers;
-
-  const bytes = randomBytes(length);
-  let password = '';
-  for (let i = 0; i < length; i++) {
-    password += chars[bytes[i] % chars.length];
+function getStrengthColor(strength: PasswordStrength): (s: string) => string {
+  switch (strength.label) {
+    case 'Weak': return theme.error;
+    case 'Fair': return theme.warning;
+    case 'Good': return theme.primary;
+    case 'Strong': return theme.success;
   }
-
-  return password;
-}
-
-function calculateStrength(password: string): { score: number; label: string; color: (s: string) => string } {
-  let score = 0;
-
-  if (password.length >= 8) score += 1;
-  if (password.length >= 12) score += 1;
-  if (password.length >= 16) score += 1;
-  if (/[a-z]/.test(password)) score += 1;
-  if (/[A-Z]/.test(password)) score += 1;
-  if (/[0-9]/.test(password)) score += 1;
-  if (/[^a-zA-Z0-9]/.test(password)) score += 1;
-
-  if (score <= 2) return { score, label: 'Weak', color: theme.error };
-  if (score <= 4) return { score, label: 'Fair', color: theme.warning };
-  if (score <= 5) return { score, label: 'Good', color: theme.primary };
-  return { score, label: 'Strong', color: theme.success };
 }
 
 registerCommand({
@@ -60,7 +27,7 @@ registerCommand({
     // Parse arguments
     for (const arg of args) {
       if (/^\d+$/.test(arg)) {
-        length = Math.min(Math.max(parseInt(arg), 4), 128);
+        length = parseInt(arg);
       } else if (arg === '--no-symbols') {
         options.symbols = false;
       } else if (arg === '--no-numbers') {
@@ -72,23 +39,23 @@ registerCommand({
       }
     }
 
-    const password = generatePassword(length, options);
-    const strength = calculateStrength(password);
+    const result = generatePassword(length, options);
+    const strengthColor = getStrengthColor(result.strength);
 
     // Create strength bar
     const barLength = 20;
-    const filledLength = Math.round((strength.score / 7) * barLength);
-    const bar = strength.color('█'.repeat(filledLength)) + theme.dim('░'.repeat(barLength - filledLength));
+    const filledLength = Math.round((result.strength.score / 7) * barLength);
+    const bar = strengthColor('█'.repeat(filledLength)) + theme.dim('░'.repeat(barLength - filledLength));
 
     console.log('');
     console.log(box.draw([
       '',
       `  ${symbols.lock} ${theme.secondary('Generated Password')}`,
       '',
-      `  ${theme.highlight(password)}`,
+      `  ${theme.highlight(result.password)}`,
       '',
-      `  ${theme.dim('Strength:')} ${bar} ${strength.color(strength.label)}`,
-      `  ${theme.dim('Length:')} ${length} characters`,
+      `  ${theme.dim('Strength:')} ${bar} ${strengthColor(result.strength.label)}`,
+      `  ${theme.dim('Length:')} ${result.length} characters`,
       '',
     ], 60));
     console.log('');

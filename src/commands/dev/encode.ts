@@ -1,5 +1,6 @@
 import { registerCommand } from '../registry.js';
 import { theme, symbols, box } from '../../ui/colors.js';
+import { encodeText, isValidMethod, SUPPORTED_METHODS, EncodeDirection } from '../../handlers/dev/encode.js';
 
 registerCommand({
   name: 'encode',
@@ -9,7 +10,7 @@ registerCommand({
     if (args.length < 2) {
       console.log('');
       console.log(theme.error('Usage: /encode <method> <encode|decode> <text>'));
-      console.log(theme.dim('  Methods: base64, url, hex'));
+      console.log(theme.dim(`  Methods: ${SUPPORTED_METHODS.join(', ')}`));
       console.log(theme.dim('  Example: /encode base64 encode hello'));
       console.log(theme.dim('  Example: /encode url decode hello%20world'));
       console.log('');
@@ -17,15 +18,15 @@ registerCommand({
     }
 
     const method = args[0].toLowerCase();
-    const action = args[1].toLowerCase();
+    const action = args[1].toLowerCase() as EncodeDirection;
     const text = args.slice(2).join(' ');
 
-    if (!['base64', 'url', 'hex'].includes(method)) {
-      console.log(theme.error(`Unknown method: ${method}. Use base64, url, or hex`));
+    if (!isValidMethod(method)) {
+      console.log(theme.error(`Unknown method: ${method}. Use ${SUPPORTED_METHODS.join(', ')}`));
       return;
     }
 
-    if (!['encode', 'decode'].includes(action)) {
+    if (action !== 'encode' && action !== 'decode') {
       console.log(theme.error(`Unknown action: ${action}. Use encode or decode`));
       return;
     }
@@ -35,48 +36,28 @@ registerCommand({
       return;
     }
 
-    let result: string;
-
     try {
-      if (method === 'base64') {
-        if (action === 'encode') {
-          result = Buffer.from(text).toString('base64');
-        } else {
-          result = Buffer.from(text, 'base64').toString('utf8');
-        }
-      } else if (method === 'url') {
-        if (action === 'encode') {
-          result = encodeURIComponent(text);
-        } else {
-          result = decodeURIComponent(text);
-        }
-      } else {
-        if (action === 'encode') {
-          result = Buffer.from(text).toString('hex');
-        } else {
-          result = Buffer.from(text, 'hex').toString('utf8');
-        }
-      }
+      const result = encodeText(text, method, action);
 
       console.log('');
       console.log(box.draw([
         '',
-        `  ${symbols.sparkle} ${theme.gradient(method.toUpperCase() + ' ' + action.toUpperCase())}`,
+        `  ${symbols.sparkle} ${theme.gradient(result.method + ' ' + result.direction.toUpperCase())}`,
         '',
         `  ${theme.dim('Input:')}`,
-        `  ${theme.secondary(text.length > 50 ? text.slice(0, 50) + '...' : text)}`,
+        `  ${theme.secondary(result.input.length > 50 ? result.input.slice(0, 50) + '...' : result.input)}`,
         '',
         `  ${theme.dim('Output:')}`,
-        `  ${theme.success(result.length > 50 ? result.slice(0, 50) + '...' : result)}`,
+        `  ${theme.success(result.output.length > 50 ? result.output.slice(0, 50) + '...' : result.output)}`,
         '',
-        ...(result.length > 50 ? [`  ${theme.dim('(Full output: ' + result.length + ' chars)')}`] : []),
+        ...(result.output.length > 50 ? [`  ${theme.dim('(Full output: ' + result.output.length + ' chars)')}`] : []),
         '',
       ], 60));
       console.log('');
 
-      if (result.length > 50) {
+      if (result.output.length > 50) {
         console.log(theme.dim('  Full result:'));
-        console.log(`  ${result}`);
+        console.log(`  ${result.output}`);
         console.log('');
       }
     } catch (e) {

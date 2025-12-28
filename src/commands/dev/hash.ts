@@ -1,6 +1,6 @@
 import { registerCommand } from '../registry.js';
 import { theme, symbols, box } from '../../ui/colors.js';
-import { createHash } from 'crypto';
+import { computeHash, isValidAlgorithm, SUPPORTED_ALGORITHMS } from '../../handlers/dev/hash.js';
 
 registerCommand({
   name: 'hash',
@@ -10,19 +10,18 @@ registerCommand({
     if (args.length === 0) {
       console.log('');
       console.log(theme.error('Usage: /hash <algorithm> <text>'));
-      console.log(theme.dim('  Algorithms: md5, sha1, sha256, sha512'));
+      console.log(theme.dim(`  Algorithms: ${SUPPORTED_ALGORITHMS.join(', ')}`));
       console.log(theme.dim('  Example: /hash sha256 hello world'));
       console.log(theme.dim('  Default: /hash <text> uses sha256'));
       console.log('');
       return;
     }
 
-    const algorithms = ['md5', 'sha1', 'sha256', 'sha512'];
-    let algorithm = 'sha256';
+    let algorithm: typeof SUPPORTED_ALGORITHMS[number] = 'sha256';
     let text: string;
 
-    if (algorithms.includes(args[0].toLowerCase())) {
-      algorithm = args[0].toLowerCase();
+    if (isValidAlgorithm(args[0])) {
+      algorithm = args[0].toLowerCase() as typeof algorithm;
       text = args.slice(1).join(' ');
     } else {
       text = args.join(' ');
@@ -33,18 +32,18 @@ registerCommand({
       return;
     }
 
-    const hash = createHash(algorithm).update(text).digest('hex');
+    const result = computeHash(text, algorithm);
 
     console.log('');
     console.log(box.draw([
       '',
       `  ${symbols.lock} ${theme.gradient('HASH RESULT')}`,
       '',
-      `  ${theme.dim('Algorithm:')} ${theme.primary(algorithm.toUpperCase())}`,
-      `  ${theme.dim('Input:')} ${theme.secondary(text.length > 30 ? text.slice(0, 30) + '...' : text)}`,
+      `  ${theme.dim('Algorithm:')} ${theme.primary(result.algorithm)}`,
+      `  ${theme.dim('Input:')} ${theme.secondary(result.input.length > 30 ? result.input.slice(0, 30) + '...' : result.input)}`,
       '',
       `  ${theme.dim('Hash:')}`,
-      `  ${theme.success(hash)}`,
+      `  ${theme.success(result.hash)}`,
       '',
     ], 70));
     console.log('');
