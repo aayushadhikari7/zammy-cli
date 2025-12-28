@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Discussions
+    url: https://github.com/aayushadhikari7/zammy-cli/discussions
+    about: Ask questions, share ideas, or just say hi!
+  - name: Security Vulnerability
+    url: https://github.com/aayushadhikari7/zammy-cli/security/advisories/new
+    about: Report security issues privately
