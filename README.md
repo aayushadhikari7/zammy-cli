@@ -2,7 +2,7 @@
 
 # Zammy CLI
 
-**Your slice-of-life terminal companion**
+**A feature-packed CLI with utilities, dev tools, and a bit of fun**
 
 [![Tests](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml/badge.svg)](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml)
 [![npm version](https://img.shields.io/npm/v/zammy.svg)](https://www.npmjs.com/package/zammy)
@@ -19,7 +19,7 @@
 ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝     ╚═╝   ╚═╝
 ```
 
-A delightful, feature-rich terminal companion that combines utility tools, fun commands, and beautiful ASCII art into an interactive CLI experience.
+A feature-packed CLI that combines utilities, dev tools, and a bit of fun into an interactive terminal experience.
 
 [Features](#features) • [Installation](#installation) • [Commands](#commands) • [Contributing](#contributing)
 

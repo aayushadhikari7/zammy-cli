@@ -26,7 +26,7 @@ if (args.includes('--version') || args.includes('-v')) {
 
 if (args.includes('--help') || args.includes('-h')) {
   console.log(`
-zammy - Your slice-of-life terminal companion
+zammy - A feature-packed CLI with utilities, dev tools, and a bit of fun
 
 Usage: zammy [options]
 

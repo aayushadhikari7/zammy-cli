@@ -1,7 +1,7 @@
 {
   "name": "zammy",
   "version": "1.2.0",
-  "description": "Your slice-of-life terminal companion",
+  "description": "A feature-packed CLI with utilities, dev tools, and a bit of fun",
   "main": "dist/index.js",
   "bin": {
     "zammy": "./dist/index.js"

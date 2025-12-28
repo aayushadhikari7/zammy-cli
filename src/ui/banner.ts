@@ -25,7 +25,7 @@ export async function displayBanner(): Promise<void> {
       }
 
       console.log('');
-      console.log(`  ${symbols.sparkle} ${theme.secondary('Your slice-of-life terminal companion')} ${symbols.sparkle}`);
+      console.log(`  ${symbols.sparkle} ${theme.secondary('Utilities, dev tools, and a bit of fun')} ${symbols.sparkle}`);
       console.log('');
       console.log(theme.dim(`  ${symbols.arrow} Type ${theme.primary('/')} to browse commands (use ${theme.primary('\u2191\u2193')} to navigate, ${theme.primary('Tab')} to select)`));
       console.log(theme.dim(`  ${symbols.arrow} Type ${theme.primary('/help')} for full command list`));
