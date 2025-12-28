@@ -1,5 +1,5 @@
 import { getCommand } from './commands/index.js';
-import { theme } from './ui/colors.js';
+import { theme, symbols } from './ui/colors.js';
 import { displayBanner } from './ui/banner.js';
 import { exec } from 'child_process';
 import { existsSync, statSync, readFileSync } from 'fs';
@@ -201,8 +201,10 @@ export async function parseAndExecute(input: string): Promise<void> {
 
   // Check if it's a command (starts with /)
   if (!trimmed.startsWith('/')) {
-    console.log(theme.dim('Commands start with /. Shell commands start with !'));
-    console.log(theme.dim('Type /help for available commands.'));
+    console.log('');
+    console.log(`  ${symbols.info} ${theme.dim('Commands start with')} ${theme.primary('/')} ${theme.dim('• Shell commands start with')} ${theme.primary('!')}`);
+    console.log(`  ${theme.dim('   Type')} ${theme.primary('/help')} ${theme.dim('for available commands')}`);
+    console.log('');
     return;
   }
 
@@ -214,14 +216,18 @@ export async function parseAndExecute(input: string): Promise<void> {
   const command = getCommand(commandName);
 
   if (!command) {
-    console.log(theme.error(`Unknown command: /${commandName}`));
-    console.log(theme.dim('Type /help to see available commands.'));
+    console.log('');
+    console.log(`  ${symbols.cross} ${theme.error('Unknown command:')} ${theme.dim('/' + commandName)}`);
+    console.log(`  ${theme.dim('   Type')} ${theme.primary('/help')} ${theme.dim('to see all commands')}`);
+    console.log('');
     return;
   }
 
   try {
     await command.execute(args);
   } catch (error) {
-    console.log(theme.error(`Error executing command: ${error}`));
+    console.log('');
+    console.log(`  ${symbols.cross} ${theme.error('Error:')} ${theme.dim(String(error))}`);
+    console.log('');
   }
 }

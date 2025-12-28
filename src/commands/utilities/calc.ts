@@ -52,13 +52,15 @@ registerCommand({
     const expression = args.join(' ');
 
     if (!expression) {
-      console.log(theme.error('Usage: /calc <expression>'));
       console.log('');
-      console.log(theme.dim('Examples:'));
-      console.log(theme.dim('  /calc 2 + 2'));
-      console.log(theme.dim('  /calc (10 * 5) / 2'));
-      console.log(theme.dim('  /calc 2^8'));
-      console.log(theme.dim('  /calc 100 % 7'));
+      console.log(`  ${symbols.warning} ${theme.warning('Usage:')} ${theme.command('/calc')} ${theme.dim('<expression>')}`);
+      console.log('');
+      console.log(`  ${theme.dim('Examples:')}`);
+      console.log(`    ${theme.primary('/calc 2 + 2')}        ${theme.dim('→')} Basic math`);
+      console.log(`    ${theme.primary('/calc (10 * 5) / 2')} ${theme.dim('→')} Parentheses`);
+      console.log(`    ${theme.primary('/calc 2^8')}          ${theme.dim('→')} Exponents`);
+      console.log(`    ${theme.primary('/calc 100 % 7')}      ${theme.dim('→')} Modulo`);
+      console.log('');
       return;
     }
 
@@ -66,9 +68,13 @@ registerCommand({
 
     console.log('');
     if (result === null) {
-      console.log(`  ${symbols.cross} ${theme.error('Invalid expression')}`);
+      console.log(`  ${symbols.cross} ${theme.error('Invalid expression:')} ${theme.dim(expression)}`);
+      console.log(`  ${theme.dim('Only numbers and operators (+, -, *, /, ^, %) are allowed')}`);
     } else {
-      console.log(`  ${theme.dim(expression)} ${theme.dim('=')} ${theme.success(formatNumber(result))}`);
+      console.log(`  ${theme.dim('┌─────────────────────────────────────────┐')}`);
+      console.log(`  ${theme.dim('│')}  ${theme.secondary(expression)}${' '.repeat(Math.max(0, 37 - expression.length))}${theme.dim('│')}`);
+      console.log(`  ${theme.dim('│')}  ${theme.dim('=')} ${theme.b.success(formatNumber(result))}${' '.repeat(Math.max(0, 35 - formatNumber(result).length))}${theme.dim('│')}`);
+      console.log(`  ${theme.dim('└─────────────────────────────────────────┘')}`);
     }
     console.log('');
   },

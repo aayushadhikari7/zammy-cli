@@ -1,5 +1,5 @@
 import { registerCommand } from '../registry.js';
-import { theme, symbols, box } from '../../ui/colors.js';
+import { theme, symbols } from '../../ui/colors.js';
 
 const quotes = [
   { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
@@ -19,21 +19,46 @@ const quotes = [
   { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
 ];
 
+function wrapText(text: string, maxWidth: number): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    if ((currentLine + ' ' + word).trim().length <= maxWidth) {
+      currentLine = (currentLine + ' ' + word).trim();
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
 registerCommand({
   name: 'quote',
   description: 'Get an inspirational quote',
   usage: '/quote',
   async execute(_args: string[]) {
     const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    const wrapped = wrapText(quote.text, 55);
 
     console.log('');
-    console.log(box.draw([
-      '',
-      `  ${symbols.sparkle} ${theme.highlight('"' + quote.text + '"')}`,
-      '',
-      `     ${theme.dim('—')} ${theme.secondary(quote.author)}`,
-      '',
-    ], 70));
+    console.log(`  ${theme.dim('╭──────────────────────────────────────────────────────────────╮')}`);
+    console.log(`  ${theme.dim('│')}                                                                ${theme.dim('│')}`);
+    console.log(`  ${theme.dim('│')}   ${theme.ocean('❝')}                                                           ${theme.dim('│')}`);
+
+    for (const line of wrapped) {
+      const padding = 58 - line.length;
+      console.log(`  ${theme.dim('│')}     ${theme.highlight(line)}${' '.repeat(Math.max(0, padding))}${theme.dim('│')}`);
+    }
+
+    console.log(`  ${theme.dim('│')}                                                        ${theme.ocean('❞')}   ${theme.dim('│')}`);
+    console.log(`  ${theme.dim('│')}                                                                ${theme.dim('│')}`);
+    console.log(`  ${theme.dim('│')}                              ${theme.dim('—')} ${theme.secondary(quote.author)}${' '.repeat(Math.max(0, 32 - quote.author.length))}${theme.dim('│')}`);
+    console.log(`  ${theme.dim('│')}                                                                ${theme.dim('│')}`);
+    console.log(`  ${theme.dim('╰──────────────────────────────────────────────────────────────╯')}`);
     console.log('');
   },
 });

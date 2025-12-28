@@ -81,29 +81,49 @@ registerCommand({
     const luckyItem = luckyItems[Math.floor(Math.random() * luckyItems.length)];
     const luckyNumber = Math.floor(Math.random() * 100);
 
-    const cookieArt = [
-      '        ╭─────────────────────────────────────────╮',
-      '       ╱                                           ╲',
-      '      ╱                                             ╲',
-      '     ╱                                               ╲',
-      '    │                                                 │',
-      '    │                                                 │',
-      '     ╲                                               ╱',
-      '      ╲                                             ╱',
-      '       ╲___________________________________________╱',
-    ];
+    console.log('');
+    console.log(`  ${theme.sunset('╔════════════════════════════════════════════════════════════╗')}`);
+    console.log(`  ${theme.sunset('║')}     ${symbols.sparkle} ${theme.gold('F O R T U N E   C O O K I E')} ${symbols.sparkle}                    ${theme.sunset('║')}`);
+    console.log(`  ${theme.sunset('╚════════════════════════════════════════════════════════════╝')}`);
+    console.log('');
+    console.log(`  ${theme.gold('           .-"""-.        ')}`);
+    console.log(`  ${theme.gold('          /        \\       ')}`);
+    console.log(`  ${theme.gold('         |  O    O  |      ')}`);
+    console.log(`  ${theme.gold('         |  .-----.  |     ')}`);
+    console.log(`  ${theme.gold('          \\   \`-´   /      ')}`);
+    console.log(`  ${theme.gold('           \`-.___.-´       ')}`);
+    console.log('');
+    console.log(`  ${theme.dim('┌─────────────────────────────────────────────────────────┐')}`);
+    console.log(`  ${theme.dim('│')}                                                           ${theme.dim('│')}`);
 
-    console.log('');
-    console.log(`  ${symbols.sparkle} ${theme.gold('FORTUNE COOKIE')} ${symbols.sparkle}`);
-    console.log('');
+    // Word wrap fortune
+    const words = fortune.split(' ');
+    let currentLine = '';
+    const lines: string[] = [];
 
-    cookieArt.forEach(line => console.log('  ' + theme.gold(line)));
+    for (const word of words) {
+      if ((currentLine + ' ' + word).trim().length <= 55) {
+        currentLine = (currentLine + ' ' + word).trim();
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
 
+    for (const line of lines) {
+      const padding = 55 - line.length;
+      const leftPad = Math.floor(padding / 2);
+      const rightPad = padding - leftPad;
+      console.log(`  ${theme.dim('│')}  ${' '.repeat(leftPad)}${theme.highlight(line)}${' '.repeat(rightPad)}  ${theme.dim('│')}`);
+    }
+
+    console.log(`  ${theme.dim('│')}                                                           ${theme.dim('│')}`);
+    console.log(`  ${theme.dim('└─────────────────────────────────────────────────────────┘')}`);
     console.log('');
-    console.log(`  ${theme.highlight('"' + fortune + '"')}`);
-    console.log('');
-    console.log(`  ${theme.dim('Lucky number:')} ${theme.primary(luckyNumber.toString())}`);
-    console.log(`  ${theme.dim('Lucky item:')} ${theme.primary(luckyItem)}`);
+    console.log(`  ${theme.dim('┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄')}`);
+    console.log(`  ${symbols.star} ${theme.dim('Lucky number:')} ${theme.gold(luckyNumber.toString().padStart(2, '0'))}     ${symbols.sparkle} ${theme.dim('Lucky item:')} ${theme.primary(luckyItem)}`);
+    console.log(`  ${theme.dim('┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄')}`);
     console.log('');
   },
 });
