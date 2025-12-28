@@ -21,8 +21,16 @@
     "ascii-art",
     "utility"
   ],
-  "author": "",
+  "author": "Aayush Adhikari",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aayushadhikari7/zammy-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aayushadhikari7/zammy-cli/issues"
+  },
+  "homepage": "https://github.com/aayushadhikari7/zammy-cli#readme",
   "devDependencies": {
     "@types/figlet": "^1.5.8",
     "@types/node": "^20.10.0",
