@@ -1,13 +1,14 @@
+<div align="center">
+
 # Zammy CLI
 
-> Your slice-of-life terminal companion
+**Your slice-of-life terminal companion**
 
-<p align="center">
-  <a href="https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml"><img src="https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
-  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License">
-</p>
+[![Tests](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml/badge.svg)](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml)
+[![npm version](https://img.shields.io/npm/v/zammy.svg)](https://www.npmjs.com/package/zammy)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 
 ```
 ███████╗ █████╗ ███╗   ███╗███╗   ███╗██╗   ██╗
@@ -18,53 +19,88 @@
 ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝     ╚═╝   ╚═╝
 ```
 
-Zammy is a delightful, feature-rich terminal companion built with TypeScript. It combines utility tools, fun commands, and beautiful ASCII art into an interactive CLI experience.
+A delightful, feature-rich terminal companion that combines utility tools, fun commands, and beautiful ASCII art into an interactive CLI experience.
+
+[Features](#features) • [Installation](#installation) • [Commands](#commands) • [Contributing](#contributing)
+
+</div>
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Commands](#commands)
+  - [Utilities](#utilities)
+  - [Fun](#fun)
+  - [Creative](#creative)
+  - [Developer Tools](#developer-tools)
+  - [Info](#info)
+- [Enhanced Shell Commands](#enhanced-shell-commands)
+- [Interactive Features](#interactive-features)
+- [Configuration](#configuration)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
-- **Interactive Command Menu** - Type `/` to browse all commands with arrow key navigation
-- **Tab Autocomplete** - Quick command completion with Tab key
-- **Enhanced Shell Commands** - Supercharged `!` commands with colors, icons, and extra features:
-  - Colorized `ls` with file type icons and human-readable sizes
-  - Syntax-highlighted `cat` for code files
-  - Visual `tree`, `du` with progress bars, `diff` with colors
-  - Directory bookmarks, command aliases, clipboard integration
-  - Quick HTTP client, git status, timestamp converter, and more!
-- **Beautiful ASCII Art** - Convert images to ASCII with multiple styles and edge detection
-- **Rich UI** - Colorful output, box drawings, gradients, and Unicode symbols
-- **Cross-Platform** - Works on Windows, macOS, and Linux
-- **Custom Terminal Support** - Graceful fallback for non-TTY environments
+- **Interactive Command Menu** — Type `/` to browse all commands with arrow key navigation
+- **Tab Autocomplete** — Quick command completion with Tab key
+- **Enhanced Shell Commands** — Supercharged `!` commands with colors, icons, and extra features
+- **Beautiful ASCII Art** — Convert images to ASCII with multiple styles and edge detection
+- **Rich UI** — Colorful output, box drawings, gradients, and Unicode symbols
+- **Cross-Platform** — Works on Windows, macOS, and Linux
+- **Fully Tested** — Comprehensive test suite with 150+ unit tests
 
 ## Installation
 
+### From npm
+
 ```bash
-# Clone the repository
+npm install -g zammy
+```
+
+### From Source
+
+```bash
 git clone https://github.com/aayushadhikari7/zammy-cli.git
 cd zammy-cli
-
-# Install dependencies
 npm install
-
-# Build the project
 npm run build
-
-# Run Zammy
 npm start
 ```
 
-### Global Installation (Development)
+### Development Installation
 
 ```bash
 npm link
 zammy
 ```
 
-### Running in Custom Terminals
-
-If your terminal doesn't support interactive features, Zammy automatically falls back to simple mode:
+## Quick Start
 
 ```bash
-zammy --simple  # Force simple mode
+# Start Zammy
+zammy
+
+# Check version
+zammy --version
+
+# Force simple mode (for non-TTY terminals)
+zammy --simple
+```
+
+Once inside Zammy:
+
+```
+zammy❯ /help              # See all commands
+zammy❯ /calc 2^10         # Quick math
+zammy❯ /password 16       # Generate secure password
+zammy❯ !ls                # Enhanced file listing
+zammy❯ /asciiart @img.png # Convert image to ASCII
 ```
 
 ## Commands
@@ -105,25 +141,22 @@ zammy --simple  # Force simple mode
 | `/color <hex\|rgb\|random>` | Color converter with preview |
 
 **ASCII Art Options:**
+
 ```bash
 /asciiart @photo.png --width 100 --style detailed --edges
 ```
 
-Styles available:
-- `standard` - 10 character levels
-- `detailed` - 70 characters for smooth gradients (default)
-- `blocks` - Unicode block elements (░▒▓█)
-- `simple` - Clean 5-level output
-- `extended` - Maximum depth
+Available styles: `standard`, `detailed` (default), `blocks`, `simple`, `extended`
 
 **Figlet Fonts:**
+
 ```bash
 /figlet Hello --font Slant
 ```
 
 Available fonts: Standard, Big, Slant, Small, Banner, Block, Bubble, Digital, Mini, Script, Shadow, Speed
 
-### Dev
+### Developer Tools
 
 | Command | Description |
 |---------|-------------|
@@ -145,15 +178,13 @@ Zammy provides **supercharged shell commands** that go beyond what a standard te
 
 | Command | Description |
 |---------|-------------|
-| `!ls [-la]` | Colorized file listing with file type icons, sizes, and dates |
-| `!tree` | Visual directory tree with icons and smart filtering |
-| `!cat <file>` | View files with syntax highlighting for code |
-| `!find <pattern>` | Find files matching pattern with colored results |
-| `!grep <pattern>` | Search file contents with highlighted matches |
+| `!ls [-la]` | Colorized file listing with file type icons and sizes |
+| `!tree` | Visual directory tree with icons |
+| `!cat <file>` | View files with syntax highlighting |
+| `!find <pattern>` | Find files with colored results |
+| `!grep <pattern>` | Search contents with highlighted matches |
 | `!du` | Disk usage with visual progress bars |
-| `!diff <f1> <f2>` | Compare two files with colored diff output |
-| `!wc <file>` | Word, line, and character counts |
-| `!head <file>` | Show first N lines of a file |
+| `!diff <f1> <f2>` | Compare files with colored output |
 
 ### Navigation
 
@@ -161,52 +192,35 @@ Zammy provides **supercharged shell commands** that go beyond what a standard te
 |---------|-------------|
 | `!cd <path>` | Change directory (supports `~` and `-`) |
 | `!pwd` | Show current directory |
-| `!bookmark save <name>` | Save current directory as bookmark |
-| `!bookmark go <name>` | Jump to a saved bookmark |
-| `!bookmark list` | List all bookmarks |
-| `!bookmark del <name>` | Delete a bookmark |
+| `!bookmark save/go/list/del` | Directory bookmarks |
 
 ### Developer Tools
 
 | Command | Description |
 |---------|-------------|
-| `!git [status\|log\|branch]` | Enhanced git with colored, formatted output |
-| `!json <file>` | Pretty print JSON with syntax highlighting |
-| `!http GET <url>` | Quick HTTP requests with JSON auto-formatting |
-| `!epoch [time]` | Convert between timestamps and dates |
-| `!serve [port]` | Start a quick HTTP server |
+| `!git [status\|log\|branch]` | Enhanced git with colors |
+| `!json <file>` | Pretty print JSON |
+| `!http GET <url>` | Quick HTTP requests |
+| `!epoch [time]` | Timestamp converter |
+| `!serve [port]` | Quick HTTP server |
 
 ### System
 
 | Command | Description |
 |---------|-------------|
-| `!ip` | Show local and public IP addresses |
-| `!ps` | Process list with formatted output |
-| `!env [filter]` | View environment variables |
-| `!clipboard copy <text>` | Copy text to clipboard |
-| `!clipboard paste` | Show clipboard contents |
-| `!clipboard file <path>` | Copy file contents to clipboard |
-| `!notify <message>` | Send desktop notification |
+| `!ip` | Show local and public IP |
+| `!ps` | Process list |
+| `!env [filter]` | Environment variables |
+| `!clipboard copy/paste/file` | Clipboard operations |
+| `!notify <message>` | Desktop notification |
 
-### Utilities
-
-| Command | Description |
-|---------|-------------|
-| `!alias add <name> <cmd>` | Create command shortcuts |
-| `!alias list` | Show all aliases |
-| `!alias run <name>` | Run a saved alias |
-| `!watch <file>` | Watch file for changes (like tail -f) |
-| `!clear` | Clear screen (preserves Zammy banner) |
-
-### Cross-Platform Translation
+### Cross-Platform
 
 Linux/macOS commands are automatically translated on Windows:
 - `ls` → Enhanced colorized listing
 - `cat` → Syntax-highlighted output
-- `rm` → `del` / `rmdir`
-- `cp` → `copy` / `xcopy`
-- `mv` → `move`
-- `grep` → Enhanced search with highlighting
+- `rm`, `cp`, `mv` → Windows equivalents
+- `grep` → Enhanced search
 
 ## Interactive Features
 
@@ -214,107 +228,24 @@ Linux/macOS commands are automatically translated on Windows:
 
 Type `/` or `!` to open an interactive command menu:
 
-- **↑/↓** - Navigate through commands (scrollable list)
-- **Tab** - Select and insert command
-- **Escape** - Close menu
-- Keep typing to filter commands by name
-- Menu shows up to 6 items with scroll indicators
+- **↑/↓** — Navigate through commands
+- **Tab** — Select and insert command
+- **Escape** — Close menu
+- Type to filter commands
 
 ### Tab Completion
 
-- Type `/asciiart @` + **Tab** → Autocompletes image files in current directory
-
-### Example Session
-
-```
-zammy❯ /
-  ❯ /help - Show all available commands
-    /asciiart - Convert an image to ASCII art
-    /calc - Calculate a math expression
-    ...
-
-zammy❯ /hash sha256 hello
-╭────────────────────────────────────────────────────────────────────╮
-│  🔒 HASH RESULT                                                    │
-│  Algorithm: SHA256                                                 │
-│  Hash: 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e7304...     │
-╰────────────────────────────────────────────────────────────────────╯
-
-zammy❯ /pomodoro start
-  🍅 POMODORO STARTED 🍅
-  Focus time! 25 minutes of deep work.
+```bash
+zammy❯ /asciiart @     # Press Tab to autocomplete image files
 ```
 
 ## Configuration
 
 Zammy runs with sensible defaults:
 
-- **Double Ctrl+C** - Required to exit (prevents accidental closure)
-- **Current directory** - Zammy respects your working directory for shell commands
-- **Persistent data** - Todos and history saved to `~/.zammy-todos.json` and `~/.zammy-history`
-
-## Tech Stack
-
-- **Runtime**: Node.js 18+
-- **Language**: TypeScript
-- **Build Tool**: tsup
-- **Image Processing**: Jimp
-- **ASCII Art**: Figlet
-- **Colors**: Chalk
-
-## Project Structure
-
-```
-zammy-cli/
-├── src/
-│   ├── index.ts              # Main entry, REPL loop
-│   ├── cli.ts                # Command parser, shell execution
-│   ├── commands/
-│   │   ├── registry.ts       # Command registration system
-│   │   ├── index.ts          # Auto-imports all categories
-│   │   ├── utilities/        # Utility commands
-│   │   │   ├── index.ts
-│   │   │   ├── help.ts
-│   │   │   ├── calc.ts
-│   │   │   ├── password.ts
-│   │   │   ├── stats.ts
-│   │   │   ├── time.ts
-│   │   │   ├── countdown.ts
-│   │   │   ├── timer.ts
-│   │   │   ├── todo.ts
-│   │   │   ├── history.ts
-│   │   │   └── exit.ts
-│   │   ├── fun/              # Fun commands
-│   │   │   ├── index.ts
-│   │   │   ├── joke.ts
-│   │   │   ├── quote.ts
-│   │   │   ├── fortune.ts
-│   │   │   ├── dice.ts
-│   │   │   ├── flip.ts
-│   │   │   └── pomodoro.ts
-│   │   ├── creative/         # Creative commands
-│   │   │   ├── index.ts
-│   │   │   ├── asciiart.ts
-│   │   │   ├── figlet.ts
-│   │   │   ├── lorem.ts
-│   │   │   └── color.ts
-│   │   ├── dev/              # Developer commands
-│   │   │   ├── index.ts
-│   │   │   ├── hash.ts
-│   │   │   ├── uuid.ts
-│   │   │   └── encode.ts
-│   │   └── info/             # Info commands
-│   │       ├── index.ts
-│   │       └── weather.ts
-│   └── ui/
-│       ├── banner.ts         # Welcome screen
-│       ├── colors.ts         # Theme, symbols, box drawing
-│       └── prompt.ts         # CLI prompt
-├── dist/                     # Compiled output
-├── package.json
-├── tsconfig.json
-└── tsup.config.ts
-```
+- **Double Ctrl+C** — Required to exit (prevents accidental closure)
+- **Current directory** — Respects your working directory
+- **Persistent data** — Saved to `~/.zammy-todos.json` and `~/.zammy-history`
 
 ## Development
 
@@ -325,47 +256,94 @@ npm install
 # Development mode (watch)
 npm run dev
 
-# Build for production
+# Build
 npm run build
 
-# Run after build
-npm start
+# Run tests
+npm test
+
+# Run tests once
+npm run test:run
+```
+
+### Project Structure
+
+```
+zammy-cli/
+├── src/
+│   ├── index.ts          # Main entry, REPL loop
+│   ├── cli.ts            # Command parser, shell execution
+│   ├── commands/         # CLI command definitions
+│   │   ├── registry.ts   # Command registration
+│   │   ├── utilities/    # Utility commands
+│   │   ├── fun/          # Fun commands
+│   │   ├── creative/     # Creative commands
+│   │   ├── dev/          # Developer commands
+│   │   └── info/         # Info commands
+│   ├── handlers/         # Business logic (testable)
+│   │   ├── dev/          # Hash, UUID, encode logic
+│   │   ├── utilities/    # Calc, password, stats logic
+│   │   ├── fun/          # Dice, flip, fortune logic
+│   │   └── creative/     # Lorem, color logic
+│   └── ui/               # UI components
+│       ├── banner.ts     # Welcome screen
+│       ├── colors.ts     # Theme, symbols
+│       └── prompt.ts     # CLI prompt
+├── dist/                 # Compiled output
+└── package.json
 ```
 
 ### Adding New Commands
 
-1. Create a new file in the appropriate category folder (e.g., `src/commands/utilities/`):
+1. Create handler in `src/handlers/<category>/`:
 
 ```typescript
+// src/handlers/utilities/myhandler.ts
+export function myFunction(input: string): string {
+  return `Processed: ${input}`;
+}
+```
+
+2. Create command in `src/commands/<category>/`:
+
+```typescript
+// src/commands/utilities/mycommand.ts
 import { registerCommand } from '../registry.js';
-import { theme, symbols } from '../../ui/colors.js';
+import { myFunction } from '../../handlers/utilities/myhandler.js';
 
 registerCommand({
   name: 'mycommand',
   description: 'Does something cool',
-  usage: '/mycommand [options]',
+  usage: '/mycommand <input>',
   async execute(args: string[]) {
-    console.log(theme.success('Hello from mycommand!'));
+    console.log(myFunction(args[0]));
   },
 });
 ```
 
-2. Import it in the category's `index.ts`:
-
-```typescript
-import './mycommand.js';
-```
-
-3. Add it to the `categories` object in `help.ts` if needed.
-
+3. Import in category's `index.ts`
 4. Rebuild and run!
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT License - feel free to use, modify, and distribute.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-<p align="center">
-  Made with ❤️ and lots of ☕
-</p>
+<div align="center">
+
+**[Back to top](#zammy-cli)**
+
+Made with TypeScript and Node.js
+
+</div>
