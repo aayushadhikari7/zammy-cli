@@ -25,8 +25,9 @@ interface MenuItem {
 // Menu state
 interface MenuState {
   visible: boolean;
-  items: MenuItem[];
-  selectedIndex: number;
+  items: MenuItem[];       // ALL items (not limited)
+  selectedIndex: number;   // Index in full items array
+  scrollOffset: number;    // First visible item index
   prefix: string;
   renderedLines: number;
 }
@@ -35,9 +36,12 @@ const menu: MenuState = {
   visible: false,
   items: [],
   selectedIndex: 0,
+  scrollOffset: 0,
   prefix: '/',
   renderedLines: 0,
 };
+
+const MAX_VISIBLE_ITEMS = 6;
 
 // Shell commands with descriptions
 const SHELL_COMMANDS: MenuItem[] = [
@@ -67,92 +71,107 @@ function getPromptLength(): number {
   return getPrompt().replace(/\x1B\[[0-9;]*m/g, '').length;
 }
 
-function eraseMenuLines(): void {
-  if (menu.renderedLines === 0) return;
+function clearBelowCursor(): void {
+  // Clear from cursor position to end of screen
+  process.stdout.write('\x1B[J');
+}
 
-  const out = process.stdout;
-
-  // Move down and erase each menu line
-  for (let i = 0; i < menu.renderedLines; i++) {
-    out.write('\x1B[1B'); // Move down
-    out.write('\x1B[2K'); // Erase line
-  }
-
-  // Move back up to prompt line
-  out.write(`\x1B[${menu.renderedLines}A`);
-
-  menu.renderedLines = 0;
+function truncateText(text: string, maxLen: number): string {
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen - 1) + '…';
 }
 
 function renderMenu(currentLine: string): void {
   if (!menu.visible || menu.items.length === 0) return;
 
   const out = process.stdout;
-  const promptLen = getPromptLength();
-  const cursorCol = promptLen + currentLine.length + 1;
 
-  // Erase old menu first
-  eraseMenuLines();
+  // Get terminal width for truncation (default to 80)
+  const termWidth = process.stdout.columns || 80;
+  const maxDescLen = Math.max(20, termWidth - 35);
 
-  // Move to next line and draw menu
-  out.write('\n');
+  // Calculate visible window
+  const totalItems = menu.items.length;
+  const visibleCount = Math.min(MAX_VISIBLE_ITEMS, totalItems);
+  const hasScrollUp = menu.scrollOffset > 0;
+  const hasScrollDown = menu.scrollOffset + visibleCount < totalItems;
 
-  menu.items.forEach((cmd, idx) => {
-    const isSelected = idx === menu.selectedIndex;
-    const pointer = isSelected ? theme.primary('❯ ') : '  ';
+  // Build menu content
+  let lines: string[] = [];
+
+  if (hasScrollUp) {
+    lines.push(theme.dim('  ↑ more'));
+  }
+
+  for (let i = 0; i < visibleCount; i++) {
+    const itemIndex = menu.scrollOffset + i;
+    const cmd = menu.items[itemIndex];
+    const isSelected = itemIndex === menu.selectedIndex;
+    const pointer = isSelected ? theme.primary('> ') : '  ';
     const name = isSelected
       ? theme.primary(`${menu.prefix}${cmd.name}`)
       : theme.dim(`${menu.prefix}${cmd.name}`);
-    const desc = theme.dim(` - ${cmd.description}`);
-    out.write(`${pointer}${name}${desc}`);
-    if (idx < menu.items.length - 1) out.write('\n');
-  });
+    const truncDesc = truncateText(cmd.description, maxDescLen);
+    const desc = theme.dim(` - ${truncDesc}`);
+    lines.push(`${pointer}${name}${desc}`);
+  }
 
-  menu.renderedLines = menu.items.length;
+  if (hasScrollDown) {
+    lines.push(theme.dim(`  ↓ ${totalItems - menu.scrollOffset - visibleCount} more`));
+  }
 
-  // Move back up to prompt line
-  out.write(`\x1B[${menu.renderedLines}A`);
+  const numLines = lines.length;
+  const cursorCol = getPromptLength() + currentLine.length + 1;
 
-  // Position cursor at correct column
+  // 1. Move to column after prompt+input, clear to end of line (in case input shortened)
+  out.write(`\x1B[${cursorCol}G\x1B[K`);
+
+  // 2. Move down, clear everything below, draw menu
+  out.write('\n');
+  clearBelowCursor();
+  out.write(lines.join('\n'));
+
+  // 3. Move back up to prompt line and position cursor
+  out.write(`\x1B[${numLines}A`);
   out.write(`\x1B[${cursorCol}G`);
+
+  menu.renderedLines = numLines;
 }
 
 function hideMenu(currentLine: string = ''): void {
   if (!menu.visible) return;
 
-  eraseMenuLines();
-
-  // Restore cursor position
-  const promptLen = getPromptLength();
-  process.stdout.write(`\x1B[${promptLen + currentLine.length + 1}G`);
+  // Clear menu area - move down, clear, move back up, restore cursor column
+  if (menu.renderedLines > 0) {
+    process.stdout.write('\n');
+    clearBelowCursor();
+    process.stdout.write('\x1B[1A');
+    // Restore cursor to correct column
+    const cursorCol = getPromptLength() + currentLine.length + 1;
+    process.stdout.write(`\x1B[${cursorCol}G`);
+  }
 
   menu.visible = false;
   menu.items = [];
   menu.selectedIndex = 0;
+  menu.scrollOffset = 0;
   menu.renderedLines = 0;
 }
 
 function showMenu(filter: string, prefix: '/' | '!', currentLine: string): void {
-  const items = prefix === '/' ? getFilteredCommands(filter) : getFilteredShellCommands(filter);
+  const allItems = prefix === '/' ? getFilteredCommands(filter) : getFilteredShellCommands(filter);
 
-  if (items.length === 0) {
+  if (allItems.length === 0) {
     if (menu.visible) hideMenu(currentLine);
     return;
   }
 
-  // Erase previous menu if visible
-  if (menu.visible) {
-    eraseMenuLines();
-  }
-
+  // Update menu state (renderMenu handles erasing)
   menu.visible = true;
-  menu.items = items;
+  menu.items = allItems;
   menu.prefix = prefix;
-
-  // Keep selection in bounds
-  if (menu.selectedIndex >= items.length) {
-    menu.selectedIndex = 0;
-  }
+  menu.selectedIndex = 0;
+  menu.scrollOffset = 0;
 
   renderMenu(currentLine);
 }
@@ -163,21 +182,25 @@ function selectMenuItem(rl: readline.Interface): string | null {
   const selected = menu.items[menu.selectedIndex];
   const newLine = menu.prefix + selected.name + ' ';
 
-  // Erase menu
-  eraseMenuLines();
-
-  // Clear current line and write new content
-  const prompt = getPrompt();
-  process.stdout.write(`\r\x1B[2K${prompt}${newLine}`);
+  // Clear menu area
+  if (menu.renderedLines > 0) {
+    process.stdout.write('\n');
+    clearBelowCursor();
+    process.stdout.write('\x1B[1A');
+  }
 
   // Update readline internal state
   (rl as any).line = newLine;
   (rl as any).cursor = newLine.length;
 
+  // Redraw prompt with new line
+  process.stdout.write(`\r${getPrompt()}${newLine}`);
+
   // Reset menu state
   menu.visible = false;
   menu.items = [];
   menu.selectedIndex = 0;
+  menu.scrollOffset = 0;
   menu.renderedLines = 0;
 
   return newLine;
@@ -186,14 +209,35 @@ function selectMenuItem(rl: readline.Interface): string | null {
 function navigateMenu(direction: 'up' | 'down', currentLine: string): void {
   if (!menu.visible || menu.items.length === 0) return;
 
+  const totalItems = menu.items.length;
+
   if (direction === 'up') {
-    menu.selectedIndex = menu.selectedIndex > 0 ? menu.selectedIndex - 1 : menu.items.length - 1;
+    if (menu.selectedIndex > 0) {
+      menu.selectedIndex--;
+    } else {
+      // Wrap to bottom
+      menu.selectedIndex = totalItems - 1;
+      menu.scrollOffset = Math.max(0, totalItems - MAX_VISIBLE_ITEMS);
+    }
   } else {
-    menu.selectedIndex = menu.selectedIndex < menu.items.length - 1 ? menu.selectedIndex + 1 : 0;
+    if (menu.selectedIndex < totalItems - 1) {
+      menu.selectedIndex++;
+    } else {
+      // Wrap to top
+      menu.selectedIndex = 0;
+      menu.scrollOffset = 0;
+    }
   }
 
-  // Re-render menu with new selection
-  eraseMenuLines();
+  // Adjust scroll offset to keep selection visible
+  const visibleCount = Math.min(MAX_VISIBLE_ITEMS, totalItems);
+  if (menu.selectedIndex < menu.scrollOffset) {
+    menu.scrollOffset = menu.selectedIndex;
+  } else if (menu.selectedIndex >= menu.scrollOffset + visibleCount) {
+    menu.scrollOffset = menu.selectedIndex - visibleCount + 1;
+  }
+
+  // Re-render menu with new selection (renderMenu handles erasing)
   renderMenu(currentLine);
 }
 
@@ -257,26 +301,22 @@ async function main() {
   // Track previous line to detect changes
   let prevLine = '';
 
-  // Only enable interactive menu in TTY mode
+  // Enable interactive menu in TTY mode
   if (isTTY && !isSimpleMode) {
-    // Handle keypress for menu navigation
     process.stdin.on('keypress', (_char, key) => {
       if (!key) return;
 
       const currentLine = (rl as any).line || '';
 
-      // Handle menu navigation when menu is visible
       if (menu.visible) {
-        if (key.name === 'up') {
-          navigateMenu('up', currentLine);
+        if (key.name === 'up' || key.name === 'down') {
+          navigateMenu(key.name, currentLine);
           return;
         }
-        if (key.name === 'down') {
-          navigateMenu('down', currentLine);
-          return;
-        }
-        if (key.name === 'tab') {
-          selectMenuItem(rl);
+        if (key.name === 'tab' || key.name === 'return') {
+          if (key.name === 'tab') {
+            selectMenuItem(rl);
+          }
           return;
         }
         if (key.name === 'escape') {
@@ -285,15 +325,12 @@ async function main() {
         }
       }
 
-      // Update menu after keystroke is processed
+      // Update menu after keystroke
       setImmediate(() => {
         const line = (rl as any).line || '';
-
-        // Only update if line changed
         if (line === prevLine) return;
         prevLine = line;
 
-        // Show menu for / or ! commands
         if (line.startsWith('/') && !line.includes(' ')) {
           showMenu(line.slice(1), '/', line);
         } else if (line.startsWith('!') && !line.includes(' ')) {
@@ -327,7 +364,7 @@ async function main() {
   rl.setPrompt(getPrompt());
 
   rl.on('line', async (input) => {
-    hideMenu('');
+    hideMenu(input);
     prevLine = '';
     await parseAndExecute(input);
     rl.prompt();
