@@ -6,6 +6,10 @@ import { theme } from './ui/colors.js';
 import { getAllCommands } from './commands/registry.js';
 import { readdirSync } from 'fs';
 
+// Detect if we're in a proper TTY environment
+const isTTY = process.stdin.isTTY && process.stdout.isTTY;
+const isSimpleMode = process.argv.includes('--simple') || !isTTY;
+
 // Import commands to register them
 import './commands/index.js';
 
@@ -235,62 +239,71 @@ function completer(line: string): [string[], string] {
 }
 
 async function main() {
+  // Show simple mode notice if not TTY
+  if (isSimpleMode && !process.argv.includes('--simple')) {
+    console.log(theme.dim('Note: Running in simple mode (no TTY detected). Use Tab for autocomplete.'));
+    console.log(theme.dim('For full features, run in a proper terminal or use: zammy --simple\n'));
+  }
+
   await displayBanner();
 
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-    terminal: true,
+    terminal: isTTY,
     completer: completer,
   });
 
   // Track previous line to detect changes
   let prevLine = '';
 
-  // Handle keypress for menu navigation
-  process.stdin.on('keypress', (_char, key) => {
-    if (!key) return;
+  // Only enable interactive menu in TTY mode
+  if (isTTY && !isSimpleMode) {
+    // Handle keypress for menu navigation
+    process.stdin.on('keypress', (_char, key) => {
+      if (!key) return;
 
-    const currentLine = (rl as any).line || '';
+      const currentLine = (rl as any).line || '';
 
-    // Handle menu navigation when menu is visible
-    if (menu.visible) {
-      if (key.name === 'up') {
-        navigateMenu('up', currentLine);
-        return;
+      // Handle menu navigation when menu is visible
+      if (menu.visible) {
+        if (key.name === 'up') {
+          navigateMenu('up', currentLine);
+          return;
+        }
+        if (key.name === 'down') {
+          navigateMenu('down', currentLine);
+          return;
+        }
+        if (key.name === 'tab') {
+          selectMenuItem(rl);
+          return;
+        }
+        if (key.name === 'escape') {
+          hideMenu(currentLine);
+          return;
+        }
       }
-      if (key.name === 'down') {
-        navigateMenu('down', currentLine);
-        return;
-      }
-      if (key.name === 'tab') {
-        selectMenuItem(rl);
-        return;
-      }
-      if (key.name === 'escape') {
-        hideMenu(currentLine);
-        return;
-      }
-    }
 
-    // Update menu after keystroke is processed
-    setImmediate(() => {
-      const line = (rl as any).line || '';
+      // Update menu after keystroke is processed
+      setImmediate(() => {
+        const line = (rl as any).line || '';
 
-      // Only update if line changed
-      if (line === prevLine) return;
-      prevLine = line;
+        // Only update if line changed
+        if (line === prevLine) return;
+        prevLine = line;
 
-      // Show menu for / or ! commands
-      if (line.startsWith('/') && !line.includes(' ')) {
-        showMenu(line.slice(1), '/', line);
-      } else if (line.startsWith('!') && !line.includes(' ')) {
-        showMenu(line.slice(1), '!', line);
-      } else if (menu.visible) {
-        hideMenu(line);
-      }
+        // Show menu for / or ! commands
+        if (line.startsWith('/') && !line.includes(' ')) {
+          showMenu(line.slice(1), '/', line);
+        } else if (line.startsWith('!') && !line.includes(' ')) {
+          showMenu(line.slice(1), '!', line);
+        } else if (menu.visible) {
+          hideMenu(line);
+        }
+      });
     });
-  });
+  }
 
   // Double Ctrl+C to exit
   let lastCtrlC = 0;

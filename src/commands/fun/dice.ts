@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme, symbols } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols } from '../../ui/colors.js';
 
 const diceArt: Record<number, string[]> = {
   1: [

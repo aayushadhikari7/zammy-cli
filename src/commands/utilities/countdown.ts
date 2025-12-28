@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme, symbols, spinnerFrames } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols, spinnerFrames } from '../../ui/colors.js';
 
 function parseTime(input: string): number | null {
   // Parse formats like: 30, 30s, 5m, 1h, 1m30s

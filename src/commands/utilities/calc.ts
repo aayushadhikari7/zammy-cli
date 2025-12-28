@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme, symbols } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols } from '../../ui/colors.js';
 
 // Safe math expression evaluator (no eval!)
 function evaluate(expression: string): number | null {

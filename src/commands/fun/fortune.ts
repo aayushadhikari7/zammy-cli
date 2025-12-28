@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme, symbols } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols } from '../../ui/colors.js';
 
 const fortunes = [
   "A beautiful, smart, and loving person will be coming into your life.",

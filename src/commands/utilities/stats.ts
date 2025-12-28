@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme, symbols, box } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols, box } from '../../ui/colors.js';
 import { cpus, totalmem, freemem, uptime, platform, arch, hostname, userInfo } from 'os';
 
 function formatBytes(bytes: number): string {

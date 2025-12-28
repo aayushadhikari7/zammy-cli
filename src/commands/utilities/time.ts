@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme, symbols } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols } from '../../ui/colors.js';
 
 const clockDigits: Record<string, string[]> = {
   '0': ['╭───╮', '│   │', '│   │', '│   │', '╰───╯'],

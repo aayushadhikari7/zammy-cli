@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme, symbols, box } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols, box } from '../../ui/colors.js';
 
 const quotes = [
   { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },

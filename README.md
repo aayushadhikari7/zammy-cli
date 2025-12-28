@@ -27,6 +27,7 @@ Zammy is a delightful, feature-rich terminal companion built with TypeScript. It
 - **Beautiful ASCII Art** - Convert images to ASCII with multiple styles and edge detection
 - **Rich UI** - Colorful output, box drawings, gradients, and Unicode symbols
 - **Cross-Platform** - Works on Windows, macOS, and Linux
+- **Custom Terminal Support** - Graceful fallback for non-TTY environments
 
 ## Installation
 
@@ -52,6 +53,14 @@ npm link
 zammy
 ```
 
+### Running in Custom Terminals
+
+If your terminal doesn't support interactive features, Zammy automatically falls back to simple mode:
+
+```bash
+zammy --simple  # Force simple mode
+```
+
 ## Commands
 
 ### Utilities
@@ -65,6 +74,9 @@ zammy
 | `/stats` | Display system statistics (CPU, memory, uptime) |
 | `/time` | Show current time with ASCII clock |
 | `/countdown <time>` | Start a countdown timer (`30s`, `5m`, `1h30m`) |
+| `/timer [start\|stop\|lap]` | Stopwatch timer |
+| `/todo [add\|done\|rm]` | Persistent todo list |
+| `/history [count\|clear]` | Command history |
 
 ### Fun
 
@@ -75,12 +87,16 @@ zammy
 | `/fortune` | Get your fortune told (with lucky numbers!) |
 | `/dice [count] [sides]` | Roll dice with ASCII art |
 | `/flip [count]` | Flip coins with visual results |
+| `/pomodoro [start\|stop\|status]` | Pomodoro timer (25/5 technique) |
 
 ### Creative
 
 | Command | Description |
 |---------|-------------|
 | `/asciiart <image>` | Convert images to ASCII art |
+| `/figlet <text>` | Generate ASCII art text |
+| `/lorem [paragraphs] [sentences]` | Generate Lorem Ipsum text |
+| `/color <hex\|rgb\|random>` | Color converter with preview |
 
 **ASCII Art Options:**
 ```bash
@@ -94,10 +110,20 @@ Styles available:
 - `simple` - Clean 5-level output
 - `extended` - Maximum depth
 
-Additional flags:
-- `--edges` - Enable Sobel edge detection
-- `--invert` - Invert for light backgrounds
-- `--contrast N` - Adjust contrast (-1 to 1)
+**Figlet Fonts:**
+```bash
+/figlet Hello --font Slant
+```
+
+Available fonts: Standard, Big, Slant, Small, Banner, Block, Bubble, Digital, Mini, Script, Shadow, Speed
+
+### Dev
+
+| Command | Description |
+|---------|-------------|
+| `/hash <algo> <text>` | Hash text (md5, sha1, sha256, sha512) |
+| `/uuid [count]` | Generate UUID(s) |
+| `/encode <method> <encode\|decode> <text>` | Encode/decode (base64, url, hex) |
 
 ### Info
 
@@ -144,28 +170,31 @@ Type `/` or `!` to open an interactive command menu:
 ### Example Session
 
 ```
-zammy> /
+zammy❯ /
   ❯ /help - Show all available commands
     /asciiart - Convert an image to ASCII art
     /calc - Calculate a math expression
     ...
 
-zammy> !
-  ❯ !ls - List directory contents
-    !cd - Change directory
-    !pwd - Print working directory
-    ...
+zammy❯ /hash sha256 hello
+╭────────────────────────────────────────────────────────────────────╮
+│  🔒 HASH RESULT                                                    │
+│  Algorithm: SHA256                                                 │
+│  Hash: 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e7304...     │
+╰────────────────────────────────────────────────────────────────────╯
 
-zammy> /calc 2^10
-  2^10 = 1,024
+zammy❯ /pomodoro start
+  🍅 POMODORO STARTED 🍅
+  Focus time! 25 minutes of deep work.
 ```
 
 ## Configuration
 
-Zammy runs with sensible defaults, but you can customize:
+Zammy runs with sensible defaults:
 
 - **Double Ctrl+C** - Required to exit (prevents accidental closure)
 - **Current directory** - Zammy respects your working directory for shell commands
+- **Persistent data** - Todos and history saved to `~/.zammy-todos.json` and `~/.zammy-history`
 
 ## Tech Stack
 
@@ -181,31 +210,50 @@ Zammy runs with sensible defaults, but you can customize:
 ```
 zammy-cli/
 ├── src/
-│   ├── index.ts          # Main entry, REPL loop
-│   ├── cli.ts            # Command parser, shell execution
+│   ├── index.ts              # Main entry, REPL loop
+│   ├── cli.ts                # Command parser, shell execution
 │   ├── commands/
-│   │   ├── registry.ts   # Command registration system
-│   │   ├── index.ts      # Auto-imports all commands
-│   │   ├── help.ts
-│   │   ├── asciiart.ts
-│   │   ├── calc.ts
-│   │   ├── dice.ts
-│   │   ├── flip.ts
-│   │   ├── password.ts
-│   │   ├── stats.ts
-│   │   ├── time.ts
-│   │   ├── countdown.ts
-│   │   ├── fortune.ts
-│   │   ├── quote.ts
-│   │   ├── joke.ts
-│   │   ├── weather.ts
-│   │   ├── clear.ts
-│   │   └── exit.ts
+│   │   ├── registry.ts       # Command registration system
+│   │   ├── index.ts          # Auto-imports all categories
+│   │   ├── utilities/        # Utility commands
+│   │   │   ├── index.ts
+│   │   │   ├── help.ts
+│   │   │   ├── calc.ts
+│   │   │   ├── password.ts
+│   │   │   ├── stats.ts
+│   │   │   ├── time.ts
+│   │   │   ├── countdown.ts
+│   │   │   ├── timer.ts
+│   │   │   ├── todo.ts
+│   │   │   ├── history.ts
+│   │   │   └── exit.ts
+│   │   ├── fun/              # Fun commands
+│   │   │   ├── index.ts
+│   │   │   ├── joke.ts
+│   │   │   ├── quote.ts
+│   │   │   ├── fortune.ts
+│   │   │   ├── dice.ts
+│   │   │   ├── flip.ts
+│   │   │   └── pomodoro.ts
+│   │   ├── creative/         # Creative commands
+│   │   │   ├── index.ts
+│   │   │   ├── asciiart.ts
+│   │   │   ├── figlet.ts
+│   │   │   ├── lorem.ts
+│   │   │   └── color.ts
+│   │   ├── dev/              # Developer commands
+│   │   │   ├── index.ts
+│   │   │   ├── hash.ts
+│   │   │   ├── uuid.ts
+│   │   │   └── encode.ts
+│   │   └── info/             # Info commands
+│   │       ├── index.ts
+│   │       └── weather.ts
 │   └── ui/
-│       ├── banner.ts     # Welcome screen
-│       ├── colors.ts     # Theme, symbols, box drawing
-│       └── prompt.ts     # CLI prompt
-├── dist/                 # Compiled output
+│       ├── banner.ts         # Welcome screen
+│       ├── colors.ts         # Theme, symbols, box drawing
+│       └── prompt.ts         # CLI prompt
+├── dist/                     # Compiled output
 ├── package.json
 ├── tsconfig.json
 └── tsup.config.ts
@@ -229,11 +277,11 @@ npm start
 
 ### Adding New Commands
 
-1. Create a new file in `src/commands/`:
+1. Create a new file in the appropriate category folder (e.g., `src/commands/utilities/`):
 
 ```typescript
-import { registerCommand } from './registry.js';
-import { theme, symbols } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols } from '../../ui/colors.js';
 
 registerCommand({
   name: 'mycommand',
@@ -245,13 +293,15 @@ registerCommand({
 });
 ```
 
-2. Import it in `src/commands/index.ts`:
+2. Import it in the category's `index.ts`:
 
 ```typescript
 import './mycommand.js';
 ```
 
-3. Rebuild and run!
+3. Add it to the `categories` object in `help.ts` if needed.
+
+4. Rebuild and run!
 
 ## License
 

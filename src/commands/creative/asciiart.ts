@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme } from '../../ui/colors.js';
 import Jimp from 'jimp';
 import { existsSync } from 'fs';
 import { resolve } from 'path';

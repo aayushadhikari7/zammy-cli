@@ -23,17 +23,22 @@ export const theme = {
 };
 
 export const symbols = {
+  // Basic UI
   arrow: '\u276F',      // ❯
   check: '\u2714',      // ✔
   cross: '\u2718',      // ✘
   info: '\u2139',       // ℹ
   warning: '\u26A0',    // ⚠
   bullet: '\u2022',     // •
+
+  // Decorative
   star: '\u2605',       // ★
   heart: '\u2665',      // ♥
   diamond: '\u2666',    // ♦
   sparkle: '\u2728',    // ✨
   lightning: '\u26A1',  // ⚡
+
+  // Emoji icons
   fire: '\u{1F525}',    // 🔥
   rocket: '\u{1F680}',  // 🚀
   dice: '\u{1F3B2}',    // 🎲
@@ -42,6 +47,18 @@ export const symbols = {
   clock: '\u{1F552}',   // 🕒
   chart: '\u{1F4CA}',   // 📊
   note: '\u{1F4DD}',    // 📝
+  scroll: '\u{1F4DC}',  // 📜
+  clipboard: '\u{1F4CB}', // 📋
+  palette: '\u{1F3A8}', // 🎨
+  tomato: '\u{1F345}',  // 🍅
+  coffee: '\u2615',     // ☕
+  bell: '\u{1F514}',    // 🔔
+  gear: '\u2699',       // ⚙
+  folder: '\u{1F4C1}',  // 📁
+  terminal: '\u{1F4BB}', // 💻
+  key: '\u{1F511}',     // 🔑
+  link: '\u{1F517}',    // 🔗
+  hourglass: '\u23F3',  // ⏳
 };
 
 // Box drawing helpers

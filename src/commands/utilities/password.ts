@@ -1,5 +1,5 @@
-import { registerCommand } from './registry.js';
-import { theme, symbols, box } from '../ui/colors.js';
+import { registerCommand } from '../registry.js';
+import { theme, symbols, box } from '../../ui/colors.js';
 import { randomBytes } from 'crypto';
 
 function generatePassword(length: number, options: { uppercase: boolean; lowercase: boolean; numbers: boolean; symbols: boolean }): string {

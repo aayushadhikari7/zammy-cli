@@ -1,11 +1,12 @@
-import { registerCommand, getAllCommands } from './registry.js';
-import { theme, symbols, box } from '../ui/colors.js';
+import { registerCommand, getAllCommands } from '../registry.js';
+import { theme, symbols, box } from '../../ui/colors.js';
 
 // Command categories
 const categories: Record<string, string[]> = {
-  'Utilities': ['help', 'exit', 'calc', 'password', 'stats', 'time', 'countdown'],
-  'Fun': ['joke', 'quote', 'fortune', 'dice', 'flip'],
-  'Creative': ['asciiart'],
+  'Utilities': ['help', 'exit', 'calc', 'password', 'stats', 'time', 'countdown', 'timer', 'todo', 'history'],
+  'Fun': ['joke', 'quote', 'fortune', 'dice', 'flip', 'pomodoro'],
+  'Creative': ['asciiart', 'figlet', 'lorem', 'color'],
+  'Dev': ['hash', 'uuid', 'encode'],
   'Info': ['weather'],
 };
 
