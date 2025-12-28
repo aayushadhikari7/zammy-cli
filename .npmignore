@@ -1,0 +1,37 @@
+# Source files (dist/ is published)
+src/
+
+# Tests
+*.test.ts
+*.spec.ts
+vitest.config.ts
+coverage/
+__tests__/
+
+# Build configs
+tsconfig.json
+tsup.config.ts
+
+# CI/CD
+.github/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Development
+.claude/
+*.log
+.env*
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Misc
+*.tgz
+.npmrc
