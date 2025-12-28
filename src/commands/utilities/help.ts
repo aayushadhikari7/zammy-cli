@@ -88,7 +88,45 @@ registerCommand({
     }
 
     console.log(theme.dim('  ─────────────────────────────────────────────'));
-    console.log(`  ${symbols.terminal} ${theme.dim('Shell:')} ${theme.primary('!')}${theme.dim('command (e.g.,')} ${theme.primary('!ls')}${theme.dim(',')} ${theme.primary('!cd')}${theme.dim(')')}`);
+    console.log(`  ${symbols.terminal} ${theme.b.secondary('Enhanced Shell Commands')} ${theme.dim('(prefix with !')}`);
+    console.log(theme.dim('  ─────────────────────────────────────────────'));
+    console.log('');
+    console.log(`  ${theme.dim('File Operations')}`);
+    console.log(`    ${theme.primary('!ls')}${theme.dim(' [-la]')}        ${theme.dim('│')} ${theme.dim('Colorized file listing with icons')}`);
+    console.log(`    ${theme.primary('!tree')}             ${theme.dim('│')} ${theme.dim('Directory tree visualization')}`);
+    console.log(`    ${theme.primary('!cat')} ${theme.dim('<file>')}      ${theme.dim('│')} ${theme.dim('View file with syntax highlighting')}`);
+    console.log(`    ${theme.primary('!find')} ${theme.dim('<pattern>')} ${theme.dim('│')} ${theme.dim('Find files matching pattern')}`);
+    console.log(`    ${theme.primary('!grep')} ${theme.dim('<pattern>')} ${theme.dim('│')} ${theme.dim('Search in file contents')}`);
+    console.log(`    ${theme.primary('!du')}               ${theme.dim('│')} ${theme.dim('Disk usage with visual bars')}`);
+    console.log(`    ${theme.primary('!diff')} ${theme.dim('<f1> <f2>')} ${theme.dim('│')} ${theme.dim('Compare two files')}`);
+    console.log(`    ${theme.primary('!wc')} ${theme.dim('<file>')}       ${theme.dim('│')} ${theme.dim('Word/line/char count')}`);
+    console.log(`    ${theme.primary('!head')} ${theme.dim('<file>')}     ${theme.dim('│')} ${theme.dim('Show first N lines')}`);
+    console.log('');
+    console.log(`  ${theme.dim('Navigation')}`);
+    console.log(`    ${theme.primary('!cd')} ${theme.dim('<path>')}       ${theme.dim('│')} ${theme.dim('Change directory')}`);
+    console.log(`    ${theme.primary('!pwd')}              ${theme.dim('│')} ${theme.dim('Show current directory')}`);
+    console.log(`    ${theme.primary('!bookmark')} ${theme.dim('[cmd]')} ${theme.dim('│')} ${theme.dim('Save/jump to directory bookmarks')}`);
+    console.log('');
+    console.log(`  ${theme.dim('Developer Tools')}`);
+    console.log(`    ${theme.primary('!git')} ${theme.dim('[cmd]')}       ${theme.dim('│')} ${theme.dim('Enhanced git status/log/branch')}`);
+    console.log(`    ${theme.primary('!json')} ${theme.dim('<file>')}     ${theme.dim('│')} ${theme.dim('Pretty print JSON with colors')}`);
+    console.log(`    ${theme.primary('!http')} ${theme.dim('<url>')}      ${theme.dim('│')} ${theme.dim('Quick HTTP requests')}`);
+    console.log(`    ${theme.primary('!epoch')} ${theme.dim('[time]')}    ${theme.dim('│')} ${theme.dim('Timestamp converter')}`);
+    console.log(`    ${theme.primary('!serve')} ${theme.dim('[port]')}    ${theme.dim('│')} ${theme.dim('Quick HTTP server')}`);
+    console.log('');
+    console.log(`  ${theme.dim('System')}`);
+    console.log(`    ${theme.primary('!ip')}               ${theme.dim('│')} ${theme.dim('Show IP addresses')}`);
+    console.log(`    ${theme.primary('!ps')}               ${theme.dim('│')} ${theme.dim('Process list')}`);
+    console.log(`    ${theme.primary('!env')} ${theme.dim('[filter]')}   ${theme.dim('│')} ${theme.dim('Environment variables')}`);
+    console.log(`    ${theme.primary('!clipboard')} ${theme.dim('[cmd]')}${theme.dim('│')} ${theme.dim('Clipboard operations')}`);
+    console.log(`    ${theme.primary('!notify')} ${theme.dim('<msg>')}    ${theme.dim('│')} ${theme.dim('Desktop notification')}`);
+    console.log('');
+    console.log(`  ${theme.dim('Utilities')}`);
+    console.log(`    ${theme.primary('!alias')} ${theme.dim('[cmd]')}     ${theme.dim('│')} ${theme.dim('Command aliases')}`);
+    console.log(`    ${theme.primary('!watch')} ${theme.dim('<file>')}    ${theme.dim('│')} ${theme.dim('Watch file for changes')}`);
+    console.log(`    ${theme.primary('!clear')}            ${theme.dim('│')} ${theme.dim('Clear screen')}`);
+    console.log('');
+    console.log(theme.dim('  ─────────────────────────────────────────────'));
     console.log(`  ${symbols.info} ${theme.dim('Details:')} ${theme.primary('/help')} ${theme.dim('<command>')}`);
     console.log('');
   },

@@ -45,11 +45,37 @@ const MAX_VISIBLE_ITEMS = 6;
 
 // Shell commands with descriptions
 const SHELL_COMMANDS: MenuItem[] = [
-  { name: 'ls', description: 'List directory contents' },
+  // File Operations
+  { name: 'ls', description: 'Colorized file listing with icons' },
+  { name: 'tree', description: 'Directory tree visualization' },
+  { name: 'cat', description: 'View file with syntax highlighting' },
+  { name: 'find', description: 'Find files matching pattern' },
+  { name: 'grep', description: 'Search in file contents' },
+  { name: 'du', description: 'Disk usage with visual bars' },
+  { name: 'diff', description: 'Compare two files' },
+  { name: 'wc', description: 'Word/line/char count' },
+  { name: 'head', description: 'Show first N lines' },
+  // Navigation
   { name: 'cd', description: 'Change directory' },
   { name: 'pwd', description: 'Print working directory' },
-  { name: 'cat', description: 'Display file contents' },
+  { name: 'bookmark', description: 'Save/jump to directories' },
+  // Developer Tools
+  { name: 'git', description: 'Enhanced git status/log/branch' },
+  { name: 'json', description: 'Pretty print JSON with colors' },
+  { name: 'http', description: 'Quick HTTP requests' },
+  { name: 'epoch', description: 'Timestamp converter' },
+  { name: 'serve', description: 'Quick HTTP server' },
+  // System
+  { name: 'ip', description: 'Show IP addresses' },
+  { name: 'ps', description: 'Process list' },
+  { name: 'env', description: 'Environment variables' },
+  { name: 'clipboard', description: 'Clipboard operations' },
+  { name: 'notify', description: 'Desktop notification' },
+  // Utilities
+  { name: 'alias', description: 'Command aliases' },
+  { name: 'watch', description: 'Watch file for changes' },
   { name: 'clear', description: 'Clear screen (keeps banner)' },
+  // Basic file operations (fallback to system)
   { name: 'mkdir', description: 'Create directory' },
   { name: 'rm', description: 'Remove files' },
   { name: 'cp', description: 'Copy files' },

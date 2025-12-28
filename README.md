@@ -23,7 +23,12 @@ Zammy is a delightful, feature-rich terminal companion built with TypeScript. It
 
 - **Interactive Command Menu** - Type `/` to browse all commands with arrow key navigation
 - **Tab Autocomplete** - Quick command completion with Tab key
-- **Shell Integration** - Run shell commands with `!` prefix (with Linux-to-Windows translation)
+- **Enhanced Shell Commands** - Supercharged `!` commands with colors, icons, and extra features:
+  - Colorized `ls` with file type icons and human-readable sizes
+  - Syntax-highlighted `cat` for code files
+  - Visual `tree`, `du` with progress bars, `diff` with colors
+  - Directory bookmarks, command aliases, clipboard integration
+  - Quick HTTP client, git status, timestamp converter, and more!
 - **Beautiful ASCII Art** - Convert images to ASCII with multiple styles and edge detection
 - **Rich UI** - Colorful output, box drawings, gradients, and Unicode symbols
 - **Cross-Platform** - Works on Windows, macOS, and Linux
@@ -131,26 +136,76 @@ Available fonts: Standard, Big, Slant, Small, Banner, Block, Bubble, Digital, Mi
 |---------|-------------|
 | `/weather [city]` | Get current weather for a location |
 
-## Shell Commands
+## Enhanced Shell Commands
 
-Prefix any command with `!` to run it in the shell:
+Zammy provides **supercharged shell commands** that go beyond what a standard terminal offers. Prefix commands with `!`:
 
-```bash
-!ls              # List files (auto-translates to 'dir' on Windows)
-!cd folder       # Change directory
-!pwd             # Print working directory
-!cat file.txt    # Display file contents
-!clear           # Clear screen (preserves Zammy banner)
-```
+### File Operations
 
-**Linux/macOS commands are automatically translated on Windows:**
-- `ls` → `dir`
-- `cat` → `type`
+| Command | Description |
+|---------|-------------|
+| `!ls [-la]` | Colorized file listing with file type icons, sizes, and dates |
+| `!tree` | Visual directory tree with icons and smart filtering |
+| `!cat <file>` | View files with syntax highlighting for code |
+| `!find <pattern>` | Find files matching pattern with colored results |
+| `!grep <pattern>` | Search file contents with highlighted matches |
+| `!du` | Disk usage with visual progress bars |
+| `!diff <f1> <f2>` | Compare two files with colored diff output |
+| `!wc <file>` | Word, line, and character counts |
+| `!head <file>` | Show first N lines of a file |
+
+### Navigation
+
+| Command | Description |
+|---------|-------------|
+| `!cd <path>` | Change directory (supports `~` and `-`) |
+| `!pwd` | Show current directory |
+| `!bookmark save <name>` | Save current directory as bookmark |
+| `!bookmark go <name>` | Jump to a saved bookmark |
+| `!bookmark list` | List all bookmarks |
+| `!bookmark del <name>` | Delete a bookmark |
+
+### Developer Tools
+
+| Command | Description |
+|---------|-------------|
+| `!git [status\|log\|branch]` | Enhanced git with colored, formatted output |
+| `!json <file>` | Pretty print JSON with syntax highlighting |
+| `!http GET <url>` | Quick HTTP requests with JSON auto-formatting |
+| `!epoch [time]` | Convert between timestamps and dates |
+| `!serve [port]` | Start a quick HTTP server |
+
+### System
+
+| Command | Description |
+|---------|-------------|
+| `!ip` | Show local and public IP addresses |
+| `!ps` | Process list with formatted output |
+| `!env [filter]` | View environment variables |
+| `!clipboard copy <text>` | Copy text to clipboard |
+| `!clipboard paste` | Show clipboard contents |
+| `!clipboard file <path>` | Copy file contents to clipboard |
+| `!notify <message>` | Send desktop notification |
+
+### Utilities
+
+| Command | Description |
+|---------|-------------|
+| `!alias add <name> <cmd>` | Create command shortcuts |
+| `!alias list` | Show all aliases |
+| `!alias run <name>` | Run a saved alias |
+| `!watch <file>` | Watch file for changes (like tail -f) |
+| `!clear` | Clear screen (preserves Zammy banner) |
+
+### Cross-Platform Translation
+
+Linux/macOS commands are automatically translated on Windows:
+- `ls` → Enhanced colorized listing
+- `cat` → Syntax-highlighted output
 - `rm` → `del` / `rmdir`
 - `cp` → `copy` / `xcopy`
 - `mv` → `move`
-- `grep` → `findstr`
-- `which` → `where`
+- `grep` → Enhanced search with highlighting
 
 ## Interactive Features
 
