@@ -158,10 +158,11 @@ Prefix any command with `!` to run it in the shell:
 
 Type `/` or `!` to open an interactive command menu:
 
-- **↑/↓** - Navigate through commands
-- **Tab** or **Enter** - Select command
+- **↑/↓** - Navigate through commands (scrollable list)
+- **Tab** - Select and insert command
 - **Escape** - Close menu
-- Keep typing to filter commands
+- Keep typing to filter commands by name
+- Menu shows up to 6 items with scroll indicators
 
 ### Tab Completion
 
