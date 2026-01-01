@@ -1,0 +1,16 @@
+{
+  "name": "zammy-plugin-port",
+  "version": "1.0.0",
+  "displayName": "Port Manager",
+  "description": "Manage ports and processes",
+  "author": "Zammy CLI",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "commands": ["port"],
+  "zammy": {
+    "minVersion": "1.2.0"
+  },
+  "permissions": {
+    "shell": true
+  }
+}

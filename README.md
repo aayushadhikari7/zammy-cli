@@ -2,13 +2,12 @@
 
 # Zammy CLI
 
-**Your friendly terminal companion with utilities, dev tools, and a purple slime mascot**
+**Stop juggling 14 dev tools. Zammy has them all — plus a friendly purple slime.**
 
-[![Tests](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml/badge.svg)](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml)
 [![npm version](https://img.shields.io/npm/v/zammy.svg)](https://www.npmjs.com/package/zammy)
+[![npm downloads](https://img.shields.io/npm/dm/zammy.svg)](https://www.npmjs.com/package/zammy)
+[![Tests](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml/badge.svg)](https://github.com/aayushadhikari7/zammy-cli/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 
 ```
 ███████╗ █████╗ ███╗   ███╗███╗   ███╗██╗   ██╗
@@ -19,70 +18,68 @@
 ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝     ╚═╝   ╚═╝
 ```
 
-A feature-packed CLI that combines utilities, dev tools, and a bit of fun into an interactive terminal experience.
+An all-in-one CLI that combines dev utilities, productivity tools, and a mascot that actually cares about you.
 
-![Zammy CLI Screenshot](screenshot.png)
-
-[Features](#features) • [Installation](#installation) • [Commands](#commands) • [Contributing](#contributing)
+[Why Zammy?](#why-zammy) • [Install](#installation) • [Commands](#commands) • [Plugins](#plugin-system) • [Contributing](#contributing)
 
 </div>
 
 ---
 
-## Table of Contents
+## Why Zammy?
 
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Commands](#commands)
-  - [Utilities](#utilities)
-  - [Fun](#fun)
-  - [Creative](#creative)
-  - [Developer Tools](#developer-tools)
-  - [Info](#info)
-- [Enhanced Shell Commands](#enhanced-shell-commands)
-- [Interactive Features](#interactive-features)
-- [Configuration](#configuration)
-- [Development](#development)
-- [Contributing](#contributing)
-- [License](#license)
+**70% of developers struggle with remembering terminal commands.** We built Zammy to fix that.
 
-## Features
+| The Problem | Zammy's Solution |
+|-------------|------------------|
+| Juggling 14+ different tools | Everything in one place |
+| Forgetting command syntax | Interactive menu + autocomplete |
+| Context switching kills focus | Never leave your terminal |
+| Terminals feel cold & lifeless | Meet your new CLI companion |
+| Windows always feels like an afterthought | First-class cross-platform support |
 
-- **Meet Zammy** — Your friendly CLI mascot! An animated purple slime that blinks and reacts to your mood
-- **Interactive Command Menu** — Type `/` to browse all commands with arrow key navigation
-- **Mood Reactions** — Type "thanks", "wow", or even ":(" and Zammy reacts with different emotions
-- **Tab Autocomplete** — Quick command completion with Tab key
-- **Enhanced Shell Commands** — Supercharged `!` commands with colors, icons, and extra features
-- **Beautiful ASCII Art** — Convert images to ASCII with multiple styles and edge detection
-- **Rich UI** — Colorful output, box drawings, gradients, and Unicode symbols
-- **Cross-Platform** — Works on Windows, macOS, and Linux
-- **Simple Mode** — Use `--simple` for terminals that don't support animations
+### What Zammy Replaces
+
+```
+Before Zammy                          With Zammy
+─────────────────────────────────────────────────────────
+Open browser → hash generator         /hash sha256 mytext
+Switch to Postman for API test        !http GET api.com/users
+Open separate todo app                /todo add "Fix bug"
+Google "how to base64 encode"         /encode base64 hello
+Find UUID generator website           /uuid
+Look up git status flags              !git status
+```
+
+---
+
+## Demo
+
+![Zammy CLI Demo](assets/zammy.gif)
+
+**Try these first:**
+```bash
+zammy              # Start Zammy
+/joke              # Get a programming joke
+/zammy excited     # See Zammy get excited
+/asciiart @photo.png  # Turn any image into ASCII art
+```
+
+---
 
 ## Installation
-
-### From npm
 
 ```bash
 npm install -g zammy
 ```
 
-### From Source
+That's it. No config files. No setup wizard. Just run `zammy` and go.
 
-```bash
-git clone https://github.com/aayushadhikari7/zammy-cli.git
-cd zammy-cli
-npm install
-npm run build
-npm start
-```
+### Requirements
+- Node.js 18.0.0 or higher
+- Works on Windows, macOS, and Linux
 
-### Development Installation
-
-```bash
-npm link
-zammy
-```
+---
 
 ## Quick Start
 
@@ -90,28 +87,57 @@ zammy
 # Start Zammy
 zammy
 
-# Check version
-zammy --version
-
-# Simple mode (no animations)
-zammy --simple
-
-# Disable interactive menu
-zammy --no-menu
-
-# Minimal mode (no animations, no menu)
-zammy --simple --no-menu
-```
-
-Once inside Zammy:
-
-```
+# Once inside:
 zammy❯ /help              # See all commands
-zammy❯ /calc 2^10         # Quick math
+zammy❯ /calc 2^10         # Quick math → 1024
 zammy❯ /password 16       # Generate secure password
-zammy❯ !ls                # Enhanced file listing
-zammy❯ /asciiart @img.png # Convert image to ASCII
+zammy❯ !ls                # Enhanced file listing with icons
+zammy❯ !git status        # Pretty git status
 ```
+
+### Command Prefixes
+
+| Prefix | Type | Example |
+|--------|------|---------|
+| `/` | Zammy commands | `/help`, `/joke`, `/hash` |
+| `!` | Enhanced shell | `!ls`, `!git`, `!http` |
+| (none) | Chat with Zammy | `thanks`, `wow`, `:(` |
+
+---
+
+## Features
+
+### Meet Zammy — Your CLI Companion
+
+Zammy isn't just a command runner. It's a character that reacts to you:
+
+- **Blinks** when you're idle (it's watching!)
+- **Celebrates** when you say "thanks" or "awesome"
+- **Shows sympathy** when you type "ugh" or ":("
+- **Has 9 moods**: happy, excited, love, sleepy, thinking, surprised, sad, wink, angry
+
+```bash
+/zammy moods    # See all moods
+/zammy excited  # Make Zammy excited
+```
+
+### Interactive Command Menu
+
+Type `/` to browse commands with arrow keys:
+- **↑/↓** Navigate
+- **Tab/Enter** Select
+- **Type** to filter
+- **Escape** to close
+
+### Beautiful Output
+
+Everything is styled with colors, icons, and proper formatting:
+- Syntax-highlighted code viewing
+- Progress bars for disk usage
+- Box-drawn tables and results
+- File icons for 40+ file types
+
+---
 
 ## Commands
 
@@ -119,181 +145,253 @@ zammy❯ /asciiart @img.png # Convert image to ASCII
 
 | Command | Description |
 |---------|-------------|
-| `/help [cmd]` | Show all commands or get help for a specific command |
+| `/help [cmd]` | Show all commands or help for specific command |
+| `/calc <expr>` | Math expressions (`2+2`, `2^8`, `sqrt(144)`) |
+| `/password [len]` | Generate secure password with strength meter |
+| `/stats` | System info (CPU, memory, uptime) |
+| `/time` | Current time with ASCII clock |
+| `/countdown <time>` | Countdown timer (`30s`, `5m`, `1h30m`) |
+| `/timer` | Stopwatch with lap support |
+| `/todo` | Persistent todo list |
+| `/history` | Command history |
+| `/env [name]` | View environment variables |
+| `/size [path]` | Analyze file/folder sizes |
 | `/exit` | Exit Zammy |
-| `/calc <expr>` | Calculate math expressions (`2+2`, `2^8`, `100%7`) |
-| `/password [len]` | Generate secure passwords with strength indicator |
-| `/stats` | Display system statistics (CPU, memory, uptime) |
-| `/time` | Show current time with ASCII clock |
-| `/countdown <time>` | Start a countdown timer (`30s`, `5m`, `1h30m`) |
-| `/timer [start\|stop\|lap]` | Stopwatch timer |
-| `/todo [add\|done\|rm]` | Persistent todo list |
-| `/history [count\|clear]` | Command history |
-
-### Fun
-
-| Command | Description |
-|---------|-------------|
-| `/zammy [mood]` | Say hi to Zammy! Try: `happy`, `excited`, `love`, `sleepy`, `angry`, `moods` |
-| `/joke` | Get a random programming joke |
-| `/quote` | Get an inspirational quote |
-| `/fortune` | Get your fortune told (with lucky numbers!) |
-| `/dice [count] [sides]` | Roll dice with ASCII art |
-| `/flip [count]` | Flip coins with visual results |
-| `/pomodoro [start\|stop\|status]` | Pomodoro timer (25/5 technique) |
-
-### Creative
-
-| Command | Description |
-|---------|-------------|
-| `/asciiart <image>` | Convert images to ASCII art |
-| `/figlet <text>` | Generate ASCII art text |
-| `/lorem [paragraphs] [sentences]` | Generate Lorem Ipsum text |
-| `/color <hex\|rgb\|random>` | Color converter with preview |
-
-**ASCII Art Options:**
-
-```bash
-/asciiart @photo.png --width 100 --style detailed --edges
-```
-
-Available styles: `standard`, `detailed` (default), `blocks`, `simple`, `extended`
-
-**Figlet Fonts:**
-
-```bash
-/figlet Hello --font Slant
-```
-
-Available fonts: Standard, Big, Slant, Small, Banner, Block, Bubble, Digital, Mini, Script, Shadow, Speed
 
 ### Developer Tools
 
 | Command | Description |
 |---------|-------------|
 | `/hash <algo> <text>` | Hash text (md5, sha1, sha256, sha512) |
-| `/uuid [count]` | Generate UUID(s) |
-| `/encode <method> <encode\|decode> <text>` | Encode/decode (base64, url, hex) |
+| `/uuid [count]` | Generate UUIDs |
+| `/encode <type> <text>` | Encode/decode (base64, url, html) |
+| `/json <action>` | JSON tools (validate, format, query) |
+| `/request <method> <url>` | Make HTTP requests (no curl needed) |
+| `/diff <file1> <file2>` | Compare two files |
+
+### Fun
+
+| Command | Description |
+|---------|-------------|
+| `/zammy [mood]` | Interact with Zammy |
+| `/joke` | Random programming joke |
+| `/quote` | Inspirational quote |
+| `/fortune` | Get your fortune (with lucky numbers!) |
+| `/dice [n] [sides]` | Roll dice with ASCII art |
+| `/flip [count]` | Flip coins |
+| `/pomodoro` | 25/5 Pomodoro timer |
+
+### Creative
+
+| Command | Description |
+|---------|-------------|
+| `/asciiart @<image>` | Convert images to ASCII art |
+| `/figlet <text>` | Generate ASCII text art |
+| `/lorem [n]` | Lorem ipsum generator |
+| `/color <hex>` | Color converter & preview |
 
 ### Info
 
 | Command | Description |
 |---------|-------------|
-| `/weather [city]` | Get current weather for a location |
+| `/weather [city]` | Current weather |
+
+> **Want IP & port tools?** Install the network plugins:
+> - `/plugin install zammy-plugin-network` for `/net ip`, `/net ping`, `/net dns`, `/net speed`
+> - `/plugin install zammy-plugin-port` for `/port list`, `/port kill`, `/port check`
+
+---
 
 ## Enhanced Shell Commands
 
-Zammy provides **supercharged shell commands** that go beyond what a standard terminal offers. Prefix commands with `!`:
+Prefix any command with `!` for enhanced versions:
 
 ### File Operations
-
-| Command | Description |
-|---------|-------------|
-| `!ls [-la]` | Colorized file listing with file type icons and sizes |
-| `!tree` | Visual directory tree with icons |
-| `!cat <file>` | View files with syntax highlighting |
-| `!find <pattern>` | Find files with colored results |
-| `!grep <pattern>` | Search contents with highlighted matches |
-| `!du` | Disk usage with visual progress bars |
-| `!diff <f1> <f2>` | Compare files with colored output |
-
-### Navigation
-
-| Command | Description |
-|---------|-------------|
-| `!cd <path>` | Change directory (supports `~` and `-`) |
-| `!pwd` | Show current directory |
-| `!bookmark save/go/list/del` | Directory bookmarks |
+```bash
+!ls              # Colorized listing with icons
+!tree            # Directory tree visualization
+!cat file.js     # Syntax-highlighted file view
+!find *.ts       # Find files with colors
+!grep pattern    # Search with highlighted matches
+!du              # Disk usage with progress bars
+```
 
 ### Developer Tools
-
-| Command | Description |
-|---------|-------------|
-| `!git [status\|log\|branch]` | Enhanced git with colors |
-| `!json <file>` | Pretty print JSON |
-| `!http GET <url>` | Quick HTTP requests |
-| `!epoch [time]` | Timestamp converter |
-| `!serve [port]` | Quick HTTP server |
+```bash
+!git status      # Pretty git with branch & file status
+!git log         # Formatted commit history
+!json data.json  # Pretty-print JSON
+!http GET url    # Quick HTTP requests
+!serve 3000      # Start HTTP server
+!epoch           # Timestamp converter
+```
 
 ### System
+```bash
+!ip              # Local + public IP
+!ps              # Process list
+!env             # Environment variables
+!clipboard copy  # Clipboard operations
+!notify "Done!"  # Desktop notification
+```
 
-| Command | Description |
-|---------|-------------|
-| `!ip` | Show local and public IP |
-| `!ps` | Process list |
-| `!env [filter]` | Environment variables |
-| `!clipboard copy/paste/file` | Clipboard operations |
-| `!notify <message>` | Desktop notification |
+### Navigation
+```bash
+!cd ~/projects       # Change directory
+!bookmark save work  # Save current dir as "work"
+!bookmark go work    # Jump to "work"
+```
 
-### Cross-Platform
+---
 
-Linux/macOS commands are automatically translated on Windows:
-- `ls` → Enhanced colorized listing
-- `cat` → Syntax-highlighted output
-- `rm`, `cp`, `mv` → Windows equivalents
-- `grep` → Enhanced search
+## Plugin System
 
-## Interactive Features
+Zammy is extensible through plugins. Install community plugins or create your own.
 
-### Command Browser
-
-Type `/` or `!` to open an interactive command menu:
-
-- **↑/↓** — Navigate through commands
-- **Tab** — Select and insert command
-- **Escape** — Close menu
-- Type to filter commands
-
-### Zammy's Mood Reactions
-
-Zammy responds to your emotions! Just type naturally (without `/` or `!`):
-
-| Keywords | Zammy's Mood |
-|----------|--------------|
-| `thanks`, `love you`, `ty` | Shows love with hearts |
-| `wow`, `awesome`, `cool` | Gets excited with stars |
-| `tired`, `sleepy`, `zzz` | Yawns sleepily |
-| `:(`, `ugh`, `damn` | Reacts with frustration |
-| `sad`, `sorry`, `fail` | Shows sympathy |
-| `hmm`, `maybe`, `idk` | Thinks along with you |
-
-For `love` and `excited` moods, there's a 50% chance Zammy shows the full mascot!
-
-### Idle Animation
-
-When you're idle for a few seconds, a mini Zammy appears and blinks at you. Start typing and it disappears!
-
-### Tab Completion
+### Managing Plugins
 
 ```bash
-zammy❯ /asciiart @     # Press Tab to autocomplete image files
+/plugin list                    # Show installed plugins
+/plugin install ./my-plugin     # Install from local directory
+/plugin install zammy-plugin-x  # Install from npm
+/plugin install github:user/repo # Install from GitHub
+/plugin remove plugin-name      # Remove a plugin
 ```
+
+### Official Plugins
+
+| Plugin | Install | Description |
+|--------|---------|-------------|
+| **Faker** | `/plugin install zammy-plugin-faker` | Generate fake data (emails, names, addresses, credit cards) |
+| **Port Manager** | `/plugin install zammy-plugin-port` | List, check, and kill processes by port |
+| **Network Tools** | `/plugin install zammy-plugin-network` | IP lookup, ping, DNS, speed test |
+| **Docker** | `/plugin install zammy-plugin-docker` | Manage containers with pretty output |
+
+### Creating a Plugin
+
+```bash
+/plugin create my-plugin
+```
+
+This scaffolds a new plugin with:
+```
+my-plugin/
+├── zammy-plugin.json   # Plugin manifest
+├── package.json
+├── tsconfig.json
+├── src/
+│   └── index.ts        # Your plugin code
+└── README.md
+```
+
+### Plugin Manifest
+
+```json
+{
+  "name": "my-plugin",
+  "version": "1.0.0",
+  "displayName": "My Plugin",
+  "description": "Does something cool",
+  "main": "./dist/index.js",
+  "commands": ["mycommand"],
+  "zammy": {
+    "minVersion": "1.2.0"
+  },
+  "permissions": {
+    "shell": false,
+    "filesystem": false,
+    "network": false
+  }
+}
+```
+
+### Plugin API
+
+Plugins receive a full API for integration:
+
+```typescript
+export default {
+  activate(api) {
+    // Register commands
+    api.registerCommand({
+      name: 'mycommand',
+      description: 'My custom command',
+      usage: '/mycommand [args]',
+      async execute(args) {
+        const { theme, symbols } = api.ui;
+        console.log(theme.success('Hello from my plugin!'));
+      }
+    });
+
+    // Use storage
+    api.storage.set('key', 'value');
+
+    // Logging
+    api.log.info('Plugin loaded!');
+  }
+}
+```
+
+**Available API:**
+- `api.registerCommand()` — Add new commands
+- `api.ui.theme` — Access Zammy's color theme
+- `api.ui.symbols` — Access Unicode symbols
+- `api.storage` — Persistent key-value storage
+- `api.log` — Prefixed logging (info, warn, error)
+- `api.context` — Plugin metadata & paths
+- `api.shell` — Shell access (if permitted)
+
+---
 
 ## Configuration
 
-Zammy runs with sensible defaults:
+Zammy works out of the box with sensible defaults:
 
-- **Double Ctrl+C** — Required to exit (prevents accidental closure)
-- **Current directory** — Respects your working directory
-- **Persistent data** — Saved to `~/.zammy-todos.json` and `~/.zammy-history`
+- **Double Ctrl+C** to exit (prevents accidents)
+- **Persistent data** stored in `~/.zammy/`
+- **Command history** remembered across sessions
+
+### CLI Flags
+
+```bash
+zammy --simple    # Disable animations (for CI/pipes)
+zammy --no-menu   # Disable interactive menu
+zammy --version   # Show version
+zammy --help      # Show help
+```
+
+---
+
+## Comparison
+
+| Feature | Zammy | Oh My Zsh | tldr | Warp |
+|---------|-------|-----------|------|------|
+| Install | Node.js + `npm i -g` | Shell script | Package manager | App download |
+| Cross-platform | Win/Mac/Linux | Mac/Linux | All | Mac only |
+| Interactive menu | Yes | No | No | Yes |
+| Built-in dev tools | 26+ commands | Aliases only | Help only | AI suggestions |
+| Plugin system | Yes | Yes (300+) | No | No |
+| Mascot/personality | Zammy! | No | No | No |
+| Offline | Yes | Yes | Yes | Partial |
+
+---
 
 ## Development
 
 ```bash
-# Install dependencies
+# Clone and install
+git clone https://github.com/aayushadhikari7/zammy-cli.git
+cd zammy-cli
 npm install
 
-# Development mode (watch)
-npm run dev
+# Development
+npm run dev      # Watch mode
+npm run build    # Build
+npm test         # Run tests
 
-# Build
-npm run build
-
-# Run tests
-npm test
-
-# Run tests once
-npm run test:run
+# Link for local testing
+npm link
+zammy
 ```
 
 ### Project Structure
@@ -301,73 +399,56 @@ npm run test:run
 ```
 zammy-cli/
 ├── src/
-│   ├── index.ts          # Main entry, REPL loop
-│   ├── cli.ts            # Command parser, shell execution
-│   ├── commands/         # CLI command definitions
-│   │   ├── registry.ts   # Command registration
-│   │   ├── utilities/    # Utility commands
-│   │   ├── fun/          # Fun commands
-│   │   ├── creative/     # Creative commands
-│   │   ├── dev/          # Developer commands
-│   │   └── info/         # Info commands
-│   ├── handlers/         # Business logic (testable)
-│   │   ├── dev/          # Hash, UUID, encode logic
-│   │   ├── utilities/    # Calc, password, stats logic
-│   │   ├── fun/          # Dice, flip, fortune logic
-│   │   └── creative/     # Lorem, color logic
-│   └── ui/               # UI components
-│       ├── banner.ts     # Welcome screen with animated mascot
-│       ├── colors.ts     # Theme, symbols
-│       ├── prompt.ts     # CLI prompt
-│       └── slime-animated.ts  # Zammy mascot moods & reactions
-├── dist/                 # Compiled output
-└── package.json
+│   ├── index.ts          # Entry point & REPL
+│   ├── cli.ts            # Command parser
+│   ├── commands/         # Command implementations
+│   │   ├── utilities/    # calc, password, stats, etc.
+│   │   ├── fun/          # joke, quote, zammy, etc.
+│   │   ├── creative/     # asciiart, figlet, lorem
+│   │   ├── dev/          # hash, uuid, encode, json, request, diff
+│   │   ├── info/         # weather
+│   │   └── plugin/       # Plugin management
+│   ├── handlers/         # Reusable logic (testable)
+│   ├── plugins/          # Plugin system
+│   └── ui/               # Colors, banner, mascot
+├── packages/plugins/     # Official plugins (published separately)
+│   ├── docker/           # zammy-plugin-docker
+│   ├── faker/            # zammy-plugin-faker
+│   ├── network/          # zammy-plugin-network
+│   └── port/             # zammy-plugin-port
+└── dist/                 # Built output
 ```
 
-### Adding New Commands
-
-1. Create handler in `src/handlers/<category>/`:
-
-```typescript
-// src/handlers/utilities/myhandler.ts
-export function myFunction(input: string): string {
-  return `Processed: ${input}`;
-}
-```
-
-2. Create command in `src/commands/<category>/`:
-
-```typescript
-// src/commands/utilities/mycommand.ts
-import { registerCommand } from '../registry.js';
-import { myFunction } from '../../handlers/utilities/myhandler.js';
-
-registerCommand({
-  name: 'mycommand',
-  description: 'Does something cool',
-  usage: '/mycommand <input>',
-  async execute(args: string[]) {
-    console.log(myFunction(args[0]));
-  },
-});
-```
-
-3. Import in category's `index.ts`
-4. Rebuild and run!
+---
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Whether it's:
+- New commands
+- Bug fixes
+- Plugin development
+- Documentation improvements
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+```bash
+# 1. Fork the repo
+# 2. Create a branch
+git checkout -b feature/awesome-feature
+
+# 3. Make changes & test
+npm test
+
+# 4. Commit and push
+git commit -m "Add awesome feature"
+git push origin feature/awesome-feature
+
+# 5. Open a Pull Request
+```
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
@@ -375,6 +456,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **[Back to top](#zammy-cli)**
 
-Made with TypeScript and Node.js
+Made with TypeScript, Node.js, and a lot of purple
+
+If Zammy made you smile, give us a star!
 
 </div>

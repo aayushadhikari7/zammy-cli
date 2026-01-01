@@ -1,0 +1,28 @@
+{
+  "name": "zammy-plugin-faker",
+  "version": "1.0.0",
+  "description": "Generate fake data for testing and development",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "zammy-plugin.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["zammy-plugin", "zammy", "cli", "faker", "mock-data", "test-data"],
+  "author": "Aayush Adhikari",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aayushadhikari7/zammy-cli.git",
+    "directory": "packages/plugins/faker"
+  },
+  "bugs": {
+    "url": "https://github.com/aayushadhikari7/zammy-cli/issues"
+  },
+  "homepage": "https://github.com/aayushadhikari7/zammy-cli/tree/main/packages/plugins/faker#readme",
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

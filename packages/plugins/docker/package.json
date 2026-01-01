@@ -1,0 +1,28 @@
+{
+  "name": "zammy-plugin-docker",
+  "version": "1.0.0",
+  "description": "Docker container management with pretty output",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "zammy-plugin.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["zammy-plugin", "zammy", "cli", "docker", "containers", "devops", "container-management"],
+  "author": "Aayush Adhikari",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aayushadhikari7/zammy-cli.git",
+    "directory": "packages/plugins/docker"
+  },
+  "bugs": {
+    "url": "https://github.com/aayushadhikari7/zammy-cli/issues"
+  },
+  "homepage": "https://github.com/aayushadhikari7/zammy-cli/tree/main/packages/plugins/docker#readme",
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

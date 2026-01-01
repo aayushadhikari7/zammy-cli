@@ -1,0 +1,14 @@
+{
+  "name": "zammy-plugin-faker",
+  "version": "1.0.0",
+  "displayName": "Faker",
+  "description": "Generate fake data for testing and development",
+  "author": "Zammy CLI",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "commands": ["fake"],
+  "zammy": {
+    "minVersion": "1.2.0"
+  },
+  "permissions": {}
+}

@@ -1,7 +1,8 @@
 import { registerCommand } from '../registry.js';
 import { theme, symbols } from '../../ui/colors.js';
 
-const quotes = [
+// Fallback quotes for offline use
+const fallbackQuotes = [
   { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
   { text: "Code is like humor. When you have to explain it, it's bad.", author: "Cory House" },
   { text: "First, solve the problem. Then, write the code.", author: "John Johnson" },
@@ -18,6 +19,44 @@ const quotes = [
   { text: "There are only two hard things in Computer Science: cache invalidation and naming things.", author: "Phil Karlton" },
   { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
 ];
+
+// Fetch quote from API
+async function fetchQuote(): Promise<{ text: string; author: string }> {
+  try {
+    // Try ZenQuotes API first
+    const response = await fetch('https://zenquotes.io/api/random', {
+      signal: AbortSignal.timeout(3000),
+    });
+
+    if (response.ok) {
+      const data = await response.json() as Array<{ q: string; a: string }>;
+      if (data && data[0]) {
+        return { text: data[0].q, author: data[0].a };
+      }
+    }
+  } catch {
+    // Fall through to fallback
+  }
+
+  try {
+    // Try Quotable API as backup
+    const response = await fetch('https://api.quotable.io/random', {
+      signal: AbortSignal.timeout(3000),
+    });
+
+    if (response.ok) {
+      const data = await response.json() as { content: string; author: string };
+      if (data && data.content) {
+        return { text: data.content, author: data.author };
+      }
+    }
+  } catch {
+    // Fall through to fallback
+  }
+
+  // Use fallback
+  return fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+}
 
 function wrapText(text: string, maxWidth: number): string[] {
   const words = text.split(' ');
@@ -41,7 +80,14 @@ registerCommand({
   description: 'Get an inspirational quote',
   usage: '/quote',
   async execute(_args: string[]) {
-    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    console.log('');
+    console.log(`  ${symbols.sparkle} ${theme.dim('Fetching wisdom...')}`);
+
+    const quote = await fetchQuote();
+
+    // Clear the loading message
+    process.stdout.write('\x1B[1A\x1B[2K\x1B[1A\x1B[2K');
+
     const wrapped = wrapText(quote.text, 55);
 
     console.log('');

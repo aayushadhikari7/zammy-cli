@@ -9,3 +9,5 @@ import './countdown.js';
 import './timer.js';
 import './todo.js';
 import './history.js';
+import './env.js';
+import './size.js';

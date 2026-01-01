@@ -180,6 +180,9 @@ const noMenu = process.argv.includes('--no-menu');
 // Import commands to register them
 import './commands/index.js';
 
+// Import plugin loader
+import { initPluginLoader } from './plugins/loader.js';
+
 // Image extensions for asciiart autocomplete
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'];
 
@@ -491,6 +494,9 @@ async function main() {
   }
 
   await displayBanner(isSimpleMode);
+
+  // Initialize plugin system
+  await initPluginLoader();
 
   const rl = readline.createInterface({
     input: process.stdin,

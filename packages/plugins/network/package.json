@@ -1,0 +1,28 @@
+{
+  "name": "zammy-plugin-network",
+  "version": "1.0.0",
+  "description": "Network utilities and diagnostics",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "zammy-plugin.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["zammy-plugin", "zammy", "cli", "network", "ping", "dns", "ip", "speed-test"],
+  "author": "Aayush Adhikari",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aayushadhikari7/zammy-cli.git",
+    "directory": "packages/plugins/network"
+  },
+  "bugs": {
+    "url": "https://github.com/aayushadhikari7/zammy-cli/issues"
+  },
+  "homepage": "https://github.com/aayushadhikari7/zammy-cli/tree/main/packages/plugins/network#readme",
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}

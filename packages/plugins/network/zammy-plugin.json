@@ -1,0 +1,17 @@
+{
+  "name": "zammy-plugin-network",
+  "version": "1.0.0",
+  "displayName": "Network Tools",
+  "description": "Network utilities and diagnostics",
+  "author": "Zammy CLI",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "commands": ["net"],
+  "zammy": {
+    "minVersion": "1.2.0"
+  },
+  "permissions": {
+    "shell": true,
+    "network": true
+  }
+}

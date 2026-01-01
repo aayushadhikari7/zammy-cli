@@ -1,4 +1,4 @@
-import { registerCommand, getAllCommands } from '../registry.js';
+import { registerCommand, getAllCommands, getPluginCommands } from '../registry.js';
 import { theme, symbols, box, categoryIcons, divider } from '../../ui/colors.js';
 
 // Command categories
@@ -8,6 +8,7 @@ const categories: Record<string, string[]> = {
   'Creative': ['asciiart', 'figlet', 'lorem', 'color'],
   'Dev': ['hash', 'uuid', 'encode'],
   'Info': ['weather'],
+  'System': ['plugin'],
 };
 
 registerCommand({
@@ -71,9 +72,29 @@ registerCommand({
       console.log('');
     }
 
-    // Show uncategorized commands
+    // Show plugin commands
+    const pluginCmds = getPluginCommands();
+    if (pluginCmds.length > 0) {
+      console.log(`  ${symbols.gear} ${theme.b.secondary('Plugins')}`);
+      console.log(theme.dim('  ' + '─'.repeat(46)));
+      for (const cmd of pluginCmds) {
+        const paddedName = cmd.name.padEnd(maxNameLength + 2);
+        const pluginBadge = cmd.pluginName ? theme.dim(`[${cmd.pluginName}]`) : '';
+        console.log(
+          `    ${theme.command('/' + paddedName)} ${theme.dim('│')} ${theme.dim(cmd.description)} ${pluginBadge}`
+        );
+      }
+      console.log('');
+    }
+
+    // Show uncategorized commands (core commands not in any category)
     const categorizedNames = Object.values(categories).flat();
-    const uncategorized = commands.filter(c => !categorizedNames.includes(c.name));
+    const pluginCmdNames = pluginCmds.map(c => c.name);
+    const uncategorized = commands.filter(c =>
+      !categorizedNames.includes(c.name) &&
+      !pluginCmdNames.includes(c.name) &&
+      c.source === 'core'
+    );
 
     if (uncategorized.length > 0) {
       console.log(`  ${symbols.folder} ${theme.b.secondary('Other')}`);
