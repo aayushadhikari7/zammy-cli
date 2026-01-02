@@ -91,56 +91,75 @@ export function checkVersionCompatibility(manifest: PluginManifest): { compatibl
   return { compatible: true };
 }
 
-// Cross-platform tar.gz extraction using Node.js streams
+// Cross-platform tar.gz extraction
 async function extractTarGz(tarGzPath: string, destDir: string): Promise<void> {
-  // Use execFileSync with array args to prevent command injection
+  // Convert to forward slashes for tar compatibility on Windows
+  const tarGzForTar = isWindows ? tarGzPath.replace(/\\/g, '/') : tarGzPath;
+  const destForTar = isWindows ? destDir.replace(/\\/g, '/') : destDir;
+
+  // Try native tar with gzip support first
   try {
-    execFileSync('tar', ['-xzf', tarGzPath, '-C', destDir], {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    return;
+    let result;
+    if (isWindows) {
+      // Windows: use forward slashes and --force-local
+      result = spawnSync(`tar --force-local -xzf "${tarGzForTar}" -C "${destForTar}"`, {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+        shell: true,
+      });
+    } else {
+      // Unix: use array args (more secure, no shell needed)
+      result = spawnSync('tar', ['-xzf', tarGzPath, '-C', destDir], {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+    }
+    if (result.status === 0) return;
   } catch {
     // tar command failed, use fallback
   }
 
-  // Fallback: Use Node.js zlib to decompress
+  // Fallback: Use Node.js zlib to decompress, then extract .tar
   const tarPath = tarGzPath.replace(/\.tgz$|\.tar\.gz$/, '.tar');
-
-  await pipeline(
-    createReadStream(tarGzPath),
-    createGunzip(),
-    createWriteStream(tarPath)
-  );
+  const tarForTar = isWindows ? tarPath.replace(/\\/g, '/') : tarPath;
 
   try {
-    execFileSync('tar', ['-xf', tarPath, '-C', destDir], {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    rmSync(tarPath, { force: true });
-    return;
-  } catch {
-    rmSync(tarPath, { force: true });
-  }
+    await pipeline(
+      createReadStream(tarGzPath),
+      createGunzip(),
+      createWriteStream(tarPath)
+    );
 
-  // PowerShell fallback for Windows
-  if (isWindows) {
-    try {
-      execFileSync('powershell', ['-Command', `tar -xf '${tarPath}' -C '${destDir}'`], {
+    // Try extracting the .tar file
+    let result;
+    if (isWindows) {
+      result = spawnSync(`tar --force-local -xf "${tarForTar}" -C "${destForTar}"`, {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+        shell: true,
+      });
+    } else {
+      result = spawnSync('tar', ['-xf', tarPath, '-C', destDir], {
         encoding: 'utf-8',
         stdio: ['pipe', 'pipe', 'pipe'],
       });
-      return;
-    } catch {
-      throw new Error(
-        'Unable to extract plugin archive. Please ensure tar is available.\n' +
-        'On Windows 10+, tar should be built-in. Try running: tar --version'
-      );
     }
+
+    if (result.status === 0) {
+      rmSync(tarPath, { force: true });
+      return;
+    }
+
+    rmSync(tarPath, { force: true });
+  } catch (err) {
+    // Clean up tar file if it exists
+    try { rmSync(tarPath, { force: true }); } catch {}
   }
 
-  throw new Error('Unable to extract plugin archive. Please ensure tar is installed.');
+  throw new Error(
+    'Unable to extract plugin archive. Please ensure tar is available.\n' +
+    (isWindows ? 'On Windows 10+, tar should be built-in. Try running: tar --version' : 'Install tar and try again.')
+  );
 }
 
 // Validate a plugin manifest
@@ -322,13 +341,17 @@ export async function installFromNpm(packageName: string): Promise<{ success: bo
   try {
     mkdirSync(tempDir, { recursive: true });
 
-    // Use execFileSync with array args to prevent command injection
+    // Use spawnSync with shell for Windows compatibility (inputs already validated by isValidNpmPackageName)
     console.log(theme.dim(`  Downloading ${packageName}...`));
-    execFileSync('npm', ['pack', packageName, `--pack-destination=${tempDir}`], {
+    const packResult = spawnSync(`npm pack ${packageName} --pack-destination="${tempDir}"`, {
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
       timeout: 60000,
+      shell: true,
     });
+    if (packResult.status !== 0) {
+      throw new Error(packResult.stderr || 'npm pack failed');
+    }
 
     // Find the tarball
     const files = readdirSync(tempDir);
@@ -407,21 +430,29 @@ export async function installFromGithub(repo: string): Promise<{ success: boolea
           console.log(theme.warning(`  ${symbols.warning} npm install and npm run build will execute scripts from the repository.`));
           console.log(theme.dim(`  Installing dependencies...`));
 
-          // Use execFileSync with array args
-          execFileSync('npm', ['install', '--ignore-scripts'], {
+          // Use spawnSync with shell for cross-platform compatibility
+          const installResult = spawnSync('npm install --ignore-scripts', {
             cwd: tempDir,
             encoding: 'utf-8',
             stdio: ['pipe', 'pipe', 'pipe'],
             timeout: 120000,
+            shell: true,
           });
+          if (installResult.status !== 0) {
+            throw new Error(installResult.stderr || 'npm install failed');
+          }
 
           console.log(theme.dim(`  Building...`));
-          execFileSync('npm', ['run', 'build'], {
+          const buildResult = spawnSync('npm run build', {
             cwd: tempDir,
             encoding: 'utf-8',
             stdio: ['pipe', 'pipe', 'pipe'],
             timeout: 120000,
+            shell: true,
           });
+          if (buildResult.status !== 0) {
+            throw new Error(buildResult.stderr || 'npm run build failed');
+          }
         }
       } catch (buildError) {
         const msg = buildError instanceof Error ? buildError.message : String(buildError);
@@ -472,20 +503,28 @@ export async function installFromGit(url: string): Promise<{ success: boolean; e
           console.log(theme.warning(`  ${symbols.warning} This plugin requires building.`));
           console.log(theme.dim(`  Installing dependencies...`));
 
-          execFileSync('npm', ['install', '--ignore-scripts'], {
+          const installResult = spawnSync('npm install --ignore-scripts', {
             cwd: tempDir,
             encoding: 'utf-8',
             stdio: ['pipe', 'pipe', 'pipe'],
             timeout: 120000,
+            shell: true,
           });
+          if (installResult.status !== 0) {
+            throw new Error(installResult.stderr || 'npm install failed');
+          }
 
           console.log(theme.dim(`  Building...`));
-          execFileSync('npm', ['run', 'build'], {
+          const buildResult = spawnSync('npm run build', {
             cwd: tempDir,
             encoding: 'utf-8',
             stdio: ['pipe', 'pipe', 'pipe'],
             timeout: 120000,
+            shell: true,
           });
+          if (buildResult.status !== 0) {
+            throw new Error(buildResult.stderr || 'npm run build failed');
+          }
         }
       } catch (buildError) {
         const msg = buildError instanceof Error ? buildError.message : String(buildError);
