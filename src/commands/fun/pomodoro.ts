@@ -75,7 +75,10 @@ registerCommand({
       console.log('');
 
       // Set up notification
-      if (state.interval) clearTimeout(state.interval);
+      if (state.interval) {
+        clearTimeout(state.interval);
+        state.interval = null;
+      }
       state.interval = setTimeout(() => {
         if (state.running) {
           console.log('\n');
@@ -84,6 +87,7 @@ registerCommand({
           console.log('\n');
           state.sessions++;
           state.running = false;
+          state.interval = null;
         }
       }, DURATIONS.work);
 
@@ -96,7 +100,10 @@ registerCommand({
         return;
       }
 
-      if (state.interval) clearTimeout(state.interval);
+      if (state.interval) {
+        clearTimeout(state.interval);
+        state.interval = null;
+      }
       state.running = false;
 
       console.log('');
@@ -112,7 +119,10 @@ registerCommand({
         return;
       }
 
-      if (state.interval) clearTimeout(state.interval);
+      if (state.interval) {
+        clearTimeout(state.interval);
+        state.interval = null;
+      }
 
       if (state.mode === 'work') {
         state.sessions++;
@@ -137,6 +147,7 @@ registerCommand({
         if (state.running) {
           console.log(`\n  ${symbols.bell} ${state.mode === 'work' ? 'Focus session' : 'Break'} complete!\n`);
           state.running = false;
+          state.interval = null;
         }
       }, state.endTime - Date.now());
 

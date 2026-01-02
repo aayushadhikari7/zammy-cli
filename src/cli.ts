@@ -157,7 +157,7 @@ function highlightSyntax(content: string, ext: string): string {
 
   const kw = ext === '.py' ? keywords.py : keywords.js;
 
-  return content.split('\n').map(line => {
+  return content.split(/\r?\n/).map(line => {
     // Highlight strings
     line = line.replace(/(["'`])(?:(?!\1)[^\\]|\\.)*?\1/g, match => chalk.hex('#98C379')(match));
     // Highlight comments
@@ -972,7 +972,7 @@ function handleWatch(args: string): void {
   // Show last 10 lines initially
   try {
     const content = readFileSync(filePath, 'utf-8');
-    const lines = content.split('\n').slice(-10);
+    const lines = content.split(/\r?\n/).slice(-10);
     lines.forEach(line => console.log(theme.dim(line)));
   } catch {
     console.log(theme.dim('  (Unable to read initial content)'));
@@ -982,7 +982,7 @@ function handleWatch(args: string): void {
     if (curr.size > lastSize) {
       try {
         const newContent = readFileSync(filePath, 'utf-8');
-        const allLines = newContent.split('\n');
+        const allLines = newContent.split(/\r?\n/);
         const oldLines = Math.floor(prev.size / 50); // approximate
         const newLines = allLines.slice(-Math.max(1, allLines.length - oldLines));
         newLines.forEach(line => {
@@ -1275,8 +1275,8 @@ function handleDiff(args: string): void {
   }
 
   try {
-    const content1 = readFileSync(path1, 'utf-8').split('\n');
-    const content2 = readFileSync(path2, 'utf-8').split('\n');
+    const content1 = readFileSync(path1, 'utf-8').split(/\r?\n/);
+    const content2 = readFileSync(path2, 'utf-8').split(/\r?\n/);
 
     console.log(theme.primary(`  Comparing: ${basename(file1)} ↔ ${basename(file2)}`));
     console.log('');
@@ -1454,7 +1454,7 @@ function handleGrep(args: string): void {
 
     try {
       const content = readFileSync(filePath, 'utf-8');
-      const lines = content.split('\n');
+      const lines = content.split(/\r?\n/);
 
       lines.forEach((line, index) => {
         if (results.length >= maxResults) return;
@@ -1539,7 +1539,7 @@ function handleWc(args: string): void {
 
   try {
     const content = readFileSync(filePath, 'utf-8');
-    const lines = content.split('\n').length;
+    const lines = content.split(/\r?\n/).length;
     const words = content.split(/\s+/).filter(w => w.length > 0).length;
     const chars = content.length;
     const bytes = Buffer.byteLength(content, 'utf-8');
@@ -1586,7 +1586,7 @@ function handleHead(args: string): void {
 
   try {
     const content = readFileSync(fullPath, 'utf-8');
-    const fileLines = content.split('\n').slice(0, lines);
+    const fileLines = content.split(/\r?\n/).slice(0, lines);
     console.log(theme.dim(`  First ${lines} lines of ${basename(filePath)}:`));
     console.log('');
     fileLines.forEach((line, i) => {

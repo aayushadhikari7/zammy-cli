@@ -1,55 +1,36 @@
 import { existsSync, readdirSync, readFileSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { join, dirname, normalize, isAbsolute } from 'path';
 import { homedir } from 'os';
 import { pathToFileURL, fileURLToPath } from 'url';
 import type { PluginManifest, LoadedPlugin, ZammyPlugin, PluginState } from './types.js';
 import { createPluginAPI } from './api.js';
 import { registerPluginCommand, unregisterPluginCommands, getCommand } from '../commands/registry.js';
 import { theme, symbols } from '../ui/colors.js';
+import { getZammyVersion, compareVersions } from '../utils/version.js';
+
+// Re-export for backwards compatibility and testing
+export { compareVersions } from '../utils/version.js';
 
 // Plugin directories
 const PLUGINS_DIR = join(homedir(), '.zammy', 'plugins');
 
-// Get Zammy version for compatibility checking
-function getZammyVersion(): string {
-  try {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
+/**
+ * Validate that a plugin entry point path is safe
+ */
+function isValidEntryPoint(basePath: string, entryPoint: string): boolean {
+  const normalized = normalize(entryPoint);
 
-    // Try multiple possible locations (bundled vs source)
-    const possiblePaths = [
-      join(__dirname, 'package.json'),          // Same dir (bundled: dist/)
-      join(__dirname, '..', 'package.json'),    // One up (bundled: project root)
-      join(__dirname, '..', '..', 'package.json'), // Two up (source: src/plugins/)
-    ];
-
-    for (const pkgPath of possiblePaths) {
-      if (existsSync(pkgPath)) {
-        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
-        if (pkg.name === 'zammy' && pkg.version) {
-          return pkg.version;
-        }
-      }
-    }
-    return '0.0.0';
-  } catch {
-    return '0.0.0';
+  // Reject absolute paths
+  if (isAbsolute(normalized)) {
+    return false;
   }
-}
 
-// Compare semver versions (returns -1 if a < b, 0 if equal, 1 if a > b)
-// Exported for testing
-export function compareVersions(a: string, b: string): number {
-  const partsA = a.split('.').map(n => parseInt(n, 10) || 0);
-  const partsB = b.split('.').map(n => parseInt(n, 10) || 0);
-
-  for (let i = 0; i < 3; i++) {
-    const numA = partsA[i] || 0;
-    const numB = partsB[i] || 0;
-    if (numA < numB) return -1;
-    if (numA > numB) return 1;
+  // Reject path traversal
+  if (normalized.includes('..')) {
+    return false;
   }
-  return 0;
+
+  return true;
 }
 
 // Check if plugin is compatible with current Zammy version
@@ -159,6 +140,11 @@ export async function loadPlugin(name: string): Promise<LoadedPlugin | null> {
   const { manifest, path: pluginPath } = discovered;
 
   try {
+    // Validate entry point path (security check)
+    if (!isValidEntryPoint(pluginPath, manifest.main)) {
+      throw new Error('Invalid plugin entry point: path traversal not allowed');
+    }
+
     // Resolve the main entry point
     const mainPath = join(pluginPath, manifest.main);
     if (!existsSync(mainPath)) {

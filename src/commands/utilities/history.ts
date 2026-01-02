@@ -15,7 +15,7 @@ export function addToHistory(command: string): void {
     appendFileSync(HISTORY_FILE, `${timestamp}|${command}\n`);
 
     // Trim to max size
-    const lines = readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(l => l);
+    const lines = readFileSync(HISTORY_FILE, 'utf8').split(/\r?\n/).filter(l => l);
     if (lines.length > MAX_HISTORY) {
       writeFileSync(HISTORY_FILE, lines.slice(-MAX_HISTORY).join('\n') + '\n');
     }
@@ -44,7 +44,7 @@ registerCommand({
     let history: { time: string; cmd: string }[] = [];
     try {
       if (existsSync(HISTORY_FILE)) {
-        const lines = readFileSync(HISTORY_FILE, 'utf8').split('\n').filter(l => l);
+        const lines = readFileSync(HISTORY_FILE, 'utf8').split(/\r?\n/).filter(l => l);
         history = lines.map(line => {
           const [time, ...rest] = line.split('|');
           return { time, cmd: rest.join('|') };

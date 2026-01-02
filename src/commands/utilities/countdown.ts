@@ -59,6 +59,7 @@ registerCommand({
 
         if (remaining <= 0) {
           clearInterval(interval);
+          process.removeListener('SIGINT', cleanup);
           console.log(`  ${symbols.sparkle} ${theme.success('TIME\'S UP!')} ${symbols.sparkle}`);
           console.log('');
           // Beep!
@@ -80,6 +81,16 @@ registerCommand({
         remaining--;
         spinnerIndex++;
       }, 1000);
+
+      // Cleanup handler for SIGINT (Ctrl+C)
+      const cleanup = () => {
+        clearInterval(interval);
+        process.stdout.write('\r\x1B[K');
+        console.log(`  ${symbols.cross} ${theme.secondary('Countdown cancelled')}`);
+        console.log('');
+        resolve();
+      };
+      process.once('SIGINT', cleanup);
 
       // Initial display
       process.stdout.write(`  ${theme.secondary(spinnerFrames[0])} ${theme.primary(formatTime(remaining))} remaining...`);
