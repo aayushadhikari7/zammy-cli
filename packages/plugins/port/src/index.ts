@@ -2,44 +2,7 @@
 // Manage ports and processes
 
 import { platform } from 'os';
-
-interface PluginAPI {
-  registerCommand(command: Command): void;
-  ui: {
-    theme: {
-      primary: (text: string) => string;
-      secondary: (text: string) => string;
-      success: (text: string) => string;
-      warning: (text: string) => string;
-      error: (text: string) => string;
-      dim: (text: string) => string;
-      gradient: (text: string) => string;
-    };
-    symbols: {
-      check: string;
-      cross: string;
-      warning: string;
-      info: string;
-      sparkles: string;
-      arrow: string;
-    };
-  };
-  log: {
-    info: (message: string) => void;
-    error: (message: string) => void;
-  };
-  shell?: {
-    exec: (command: string, options?: { timeout?: number }) => string;
-    spawn: (command: string, args?: string[]) => Promise<{ stdout: string; stderr: string; code: number }>;
-  };
-}
-
-interface Command {
-  name: string;
-  description: string;
-  usage: string;
-  execute: (args: string[]) => Promise<void>;
-}
+import type { PluginAPI, ZammyPlugin } from 'zammy/plugins';
 
 interface PortInfo {
   port: number;
@@ -253,7 +216,7 @@ async function findPortsByProcess(shell: NonNullable<PluginAPI['shell']>, name: 
 
 // ============ PLUGIN ============
 
-const plugin = {
+const plugin: ZammyPlugin = {
   activate(api: PluginAPI) {
     const { theme, symbols } = api.ui;
 

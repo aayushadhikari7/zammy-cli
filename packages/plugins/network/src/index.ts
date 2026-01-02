@@ -1,49 +1,11 @@
 // Zammy Plugin: Network Tools
 // Network utilities and diagnostics
 
-import { platform } from 'os';
-import { networkInterfaces } from 'os';
+import { platform, networkInterfaces } from 'os';
 import { promises as dns } from 'dns';
 import https from 'https';
 import http from 'http';
-
-interface PluginAPI {
-  registerCommand(command: Command): void;
-  ui: {
-    theme: {
-      primary: (text: string) => string;
-      secondary: (text: string) => string;
-      success: (text: string) => string;
-      warning: (text: string) => string;
-      error: (text: string) => string;
-      dim: (text: string) => string;
-      gradient: (text: string) => string;
-    };
-    symbols: {
-      check: string;
-      cross: string;
-      warning: string;
-      info: string;
-      sparkles: string;
-      arrow: string;
-    };
-    progressBar: (current: number, total: number, width?: number) => string;
-  };
-  log: {
-    info: (message: string) => void;
-    error: (message: string) => void;
-  };
-  shell?: {
-    spawn: (command: string, args?: string[]) => Promise<{ stdout: string; stderr: string; code: number }>;
-  };
-}
-
-interface Command {
-  name: string;
-  description: string;
-  usage: string;
-  execute: (args: string[]) => Promise<void>;
-}
+import type { PluginAPI, ZammyPlugin } from 'zammy/plugins';
 
 const isWindows = platform() === 'win32';
 
@@ -301,7 +263,7 @@ async function getHeaders(url: string): Promise<HeadersResult> {
 
 // ============ PLUGIN ============
 
-const plugin = {
+const plugin: ZammyPlugin = {
   activate(api: PluginAPI) {
     const { theme, symbols, progressBar } = api.ui;
 

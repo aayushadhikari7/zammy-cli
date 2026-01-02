@@ -1,44 +1,7 @@
 // Zammy Plugin: Docker
 // Docker container management with pretty output
 
-interface PluginAPI {
-  registerCommand(command: Command): void;
-  ui: {
-    theme: {
-      primary: (text: string) => string;
-      secondary: (text: string) => string;
-      success: (text: string) => string;
-      warning: (text: string) => string;
-      error: (text: string) => string;
-      dim: (text: string) => string;
-      gradient: (text: string) => string;
-    };
-    symbols: {
-      check: string;
-      cross: string;
-      warning: string;
-      info: string;
-      sparkles: string;
-      arrow: string;
-      rocket: string;
-    };
-    progressBar: (current: number, total: number, width?: number) => string;
-  };
-  log: {
-    info: (message: string) => void;
-    error: (message: string) => void;
-  };
-  shell?: {
-    spawn: (command: string, args?: string[]) => Promise<{ stdout: string; stderr: string; code: number }>;
-  };
-}
-
-interface Command {
-  name: string;
-  description: string;
-  usage: string;
-  execute: (args: string[]) => Promise<void>;
-}
+import type { PluginAPI, ZammyPlugin } from 'zammy/plugins';
 
 interface Container {
   id: string;
@@ -253,7 +216,7 @@ function formatAge(dateStr: string): string {
 
 // ============ PLUGIN ============
 
-const plugin = {
+const plugin: ZammyPlugin = {
   activate(api: PluginAPI) {
     const { theme, symbols } = api.ui;
 

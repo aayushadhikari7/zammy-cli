@@ -1,42 +1,7 @@
 // Zammy Plugin: Faker
 // Generate fake data for testing and development
 
-interface PluginAPI {
-  registerCommand(command: Command): void;
-  ui: {
-    theme: {
-      primary: (text: string) => string;
-      secondary: (text: string) => string;
-      success: (text: string) => string;
-      warning: (text: string) => string;
-      error: (text: string) => string;
-      dim: (text: string) => string;
-      gradient: (text: string) => string;
-    };
-    symbols: {
-      check: string;
-      cross: string;
-      warning: string;
-      info: string;
-      sparkles: string;
-      arrow: string;
-    };
-    box: (content: string, options?: { title?: string; padding?: number }) => string;
-  };
-  log: {
-    info: (message: string) => void;
-  };
-  context: {
-    pluginName: string;
-  };
-}
-
-interface Command {
-  name: string;
-  description: string;
-  usage: string;
-  execute: (args: string[]) => Promise<void>;
-}
+import type { PluginAPI, ZammyPlugin } from 'zammy/plugins';
 
 // ============ DATA POOLS ============
 
@@ -296,7 +261,7 @@ function generateJson(template: string): string {
 
 // ============ PLUGIN ============
 
-const plugin = {
+const plugin: ZammyPlugin = {
   activate(api: PluginAPI) {
     const { theme, symbols } = api.ui;
 

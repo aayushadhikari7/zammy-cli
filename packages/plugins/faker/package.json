@@ -1,6 +1,6 @@
 {
   "name": "zammy-plugin-faker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generate fake data for testing and development",
   "type": "module",
   "main": "dist/index.js",
@@ -22,7 +22,11 @@
     "url": "https://github.com/aayushadhikari7/zammy-cli/issues"
   },
   "homepage": "https://github.com/aayushadhikari7/zammy-cli/tree/main/packages/plugins/faker#readme",
+  "peerDependencies": {
+    "zammy": "^1.0.0"
+  },
   "devDependencies": {
+    "zammy": "*",
     "typescript": "^5.3.0"
   }
 }
