@@ -1,6 +1,6 @@
 {
   "name": "zammy",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "A feature-packed CLI with utilities, dev tools, and a bit of fun",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

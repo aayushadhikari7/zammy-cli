@@ -295,7 +295,7 @@ my-plugin/
   "main": "./dist/index.js",
   "commands": ["mycommand"],
   "zammy": {
-    "minVersion": "1.2.0"
+    "minVersion": "1.3.0"
   },
   "permissions": {
     "shell": false,
