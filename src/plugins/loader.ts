@@ -38,7 +38,8 @@ function getZammyVersion(): string {
 }
 
 // Compare semver versions (returns -1 if a < b, 0 if equal, 1 if a > b)
-function compareVersions(a: string, b: string): number {
+// Exported for testing
+export function compareVersions(a: string, b: string): number {
   const partsA = a.split('.').map(n => parseInt(n, 10) || 0);
   const partsB = b.split('.').map(n => parseInt(n, 10) || 0);
 

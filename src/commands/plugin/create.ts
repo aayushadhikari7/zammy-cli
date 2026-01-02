@@ -1,24 +1,7 @@
 import { theme, symbols } from '../../ui/colors.js';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join, resolve } from 'path';
-import * as readline from 'readline';
-
-// Simple text input prompt
-async function prompt(message: string, defaultValue?: string): Promise<string> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  const suffix = defaultValue ? ` ${theme.dim(`(${defaultValue})`)}` : '';
-
-  return new Promise((resolvePromise) => {
-    rl.question(`  ${message}${suffix}: `, (answer) => {
-      rl.close();
-      resolvePromise(answer.trim() || defaultValue || '');
-    });
-  });
-}
+import { prompt } from '../../ui/input.js';
 
 // Generate manifest template
 function generateManifest(name: string, displayName: string, description: string, commandName: string): string {
@@ -44,12 +27,17 @@ function generatePackageJson(name: string, description: string): string {
     description,
     type: 'module',
     main: 'dist/index.js',
+    types: 'dist/index.d.ts',
     scripts: {
       build: 'tsc',
       dev: 'tsc --watch',
     },
-    keywords: ['zammy-plugin'],
+    keywords: ['zammy-plugin', 'zammy', 'cli', 'plugin'],
+    peerDependencies: {
+      zammy: '^1.3.0',
+    },
     devDependencies: {
+      zammy: '^1.3.0',
       typescript: '^5.3.0',
     },
   }, null, 2);
@@ -77,65 +65,7 @@ function generateTsConfig(): string {
 function generateEntryPoint(commandName: string, displayName: string): string {
   return `// ${displayName} - A zammy plugin
 
-// Plugin types (these match zammy's PluginAPI interface)
-interface Command {
-  name: string;
-  description: string;
-  usage: string;
-  execute: (args: string[]) => Promise<void>;
-}
-
-interface PluginAPI {
-  registerCommand(command: Command): void;
-  ui: {
-    theme: {
-      primary: (text: string) => string;
-      secondary: (text: string) => string;
-      accent: (text: string) => string;
-      success: (text: string) => string;
-      warning: (text: string) => string;
-      error: (text: string) => string;
-      info: (text: string) => string;
-      dim: (text: string) => string;
-      gradient: (text: string) => string;
-    };
-    symbols: {
-      check: string;
-      cross: string;
-      star: string;
-      arrow: string;
-      bullet: string;
-      folder: string;
-      file: string;
-      warning: string;
-      info: string;
-      rocket: string;
-      sparkles: string;
-    };
-  };
-  storage: {
-    get<T>(key: string): T | undefined;
-    set<T>(key: string, value: T): void;
-    delete(key: string): void;
-  };
-  log: {
-    info(message: string): void;
-    warn(message: string): void;
-    error(message: string): void;
-  };
-  context: {
-    pluginName: string;
-    pluginVersion: string;
-    zammyVersion: string;
-    dataDir: string;
-    cwd: string;
-  };
-}
-
-interface ZammyPlugin {
-  activate(api: PluginAPI): Promise<void> | void;
-  deactivate?(): Promise<void> | void;
-}
+import type { PluginAPI, ZammyPlugin } from 'zammy/plugins';
 
 const plugin: ZammyPlugin = {
   activate(api: PluginAPI) {

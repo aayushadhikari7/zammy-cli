@@ -10,22 +10,7 @@ import {
 } from '../../plugins/installer.js';
 import { discoverPlugins, loadPlugin } from '../../plugins/loader.js';
 import { registerPluginCommand, getCommand } from '../registry.js';
-import * as readline from 'readline';
-
-// Simple yes/no prompt
-async function confirm(message: string): Promise<boolean> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  return new Promise((resolve) => {
-    rl.question(`${message} [y/N] `, (answer) => {
-      rl.close();
-      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
-    });
-  });
-}
+import { confirm } from '../../ui/input.js';
 
 export async function installPlugin(args: string[]): Promise<void> {
   const source = args[0];

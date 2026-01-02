@@ -1,22 +1,7 @@
 import { theme, symbols } from '../../ui/colors.js';
 import { removePlugin } from '../../plugins/installer.js';
 import { getDiscoveredPlugins, unloadPlugin, discoverPlugins } from '../../plugins/loader.js';
-import * as readline from 'readline';
-
-// Simple yes/no prompt
-async function confirm(message: string): Promise<boolean> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  return new Promise((resolve) => {
-    rl.question(`${message} [y/N] `, (answer) => {
-      rl.close();
-      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
-    });
-  });
-}
+import { confirm } from '../../ui/input.js';
 
 export async function removePluginCommand(args: string[]): Promise<void> {
   // Check for -y or --yes flag (skip confirmation)
