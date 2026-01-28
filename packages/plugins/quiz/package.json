@@ -1,6 +1,6 @@
 {
   "name": "zammy-plugin-quiz",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Test your developer knowledge with interactive quizzes",
   "type": "module",
   "main": "./dist/index.js",

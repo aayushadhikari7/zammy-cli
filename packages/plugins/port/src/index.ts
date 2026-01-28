@@ -214,6 +214,31 @@ async function findPortsByProcess(shell: NonNullable<PluginAPI['shell']>, name: 
   return ports.filter(p => p.process.toLowerCase().includes(lowerName));
 }
 
+async function findFreePort(shell: NonNullable<PluginAPI['shell']>, start: number = 3000, end: number = 9000): Promise<number> {
+  const usedPorts = await getListeningPorts(shell);
+  const usedSet = new Set(usedPorts.map(p => p.port));
+
+  for (let port = start; port <= end; port++) {
+    if (!usedSet.has(port)) {
+      return port;
+    }
+  }
+  return -1;
+}
+
+async function findFreePorts(shell: NonNullable<PluginAPI['shell']>, count: number, start: number = 3000): Promise<number[]> {
+  const usedPorts = await getListeningPorts(shell);
+  const usedSet = new Set(usedPorts.map(p => p.port));
+  const freePorts: number[] = [];
+
+  for (let port = start; freePorts.length < count && port < 65535; port++) {
+    if (!usedSet.has(port)) {
+      freePorts.push(port);
+    }
+  }
+  return freePorts;
+}
+
 // ============ PLUGIN ============
 
 const plugin: ZammyPlugin = {
@@ -245,6 +270,8 @@ const plugin: ZammyPlugin = {
           console.log(`    ${theme.primary('check <port>')}  ${theme.dim('Check if port is in use')}`);
           console.log(`    ${theme.primary('kill <port>')}   ${theme.dim('Kill process on port')}`);
           console.log(`    ${theme.primary('find <name>')}   ${theme.dim('Find ports by process name')}`);
+          console.log(`    ${theme.primary('free [count]')}  ${theme.dim('Find available port(s)')}`);
+          console.log(`    ${theme.primary('range <s> <e>')} ${theme.dim('Check range of ports')}`);
           console.log('');
           return;
         }
@@ -355,6 +382,58 @@ const plugin: ZammyPlugin = {
               console.log('');
               console.log(`  ${theme.dim(`Found: ${ports.length} ports`)}`);
             }
+            break;
+          }
+
+          case 'free': {
+            const count = parseInt(args[1]) || 1;
+            console.log(`  ${theme.dim(`Finding ${count} free port${count > 1 ? 's' : ''}...`)}`);
+
+            const freePorts = await findFreePorts(shell, count);
+
+            if (freePorts.length === 0) {
+              console.log(`  ${symbols.cross} ${theme.error('No free ports found')}`);
+            } else if (count === 1) {
+              console.log(`  ${symbols.check} ${theme.success('Free port:')} ${theme.primary(freePorts[0].toString())}`);
+            } else {
+              console.log(`  ${symbols.check} ${theme.success('Free ports:')}`);
+              for (const port of freePorts) {
+                console.log(`    ${theme.primary(port.toString())}`);
+              }
+            }
+            break;
+          }
+
+          case 'range': {
+            const start = parseInt(args[1]);
+            const end = parseInt(args[2]);
+
+            if (isNaN(start) || isNaN(end)) {
+              console.log(`  ${symbols.warning} ${theme.warning('Usage:')} /port range <start> <end>`);
+              console.log(`  ${theme.dim('Example:')} /port range 3000 3010`);
+              break;
+            }
+
+            console.log(`  ${symbols.sparkles} ${theme.gradient(`PORTS ${start}-${end}`)}`);
+            console.log('');
+
+            const allPorts = await getListeningPorts(shell);
+            const usedSet = new Set(allPorts.map(p => p.port));
+
+            let usedCount = 0;
+            for (let port = start; port <= end; port++) {
+              const inUse = usedSet.has(port);
+              if (inUse) usedCount++;
+              const portInfo = allPorts.find(p => p.port === port);
+              const icon = inUse ? symbols.cross : symbols.check;
+              const color = inUse ? theme.error : theme.success;
+              const process = portInfo ? theme.dim(` (${portInfo.process})`) : '';
+              console.log(`  ${icon} ${color(port.toString())}${process}`);
+            }
+
+            console.log('');
+            const total = end - start + 1;
+            console.log(`  ${theme.dim(`${usedCount}/${total} in use, ${total - usedCount} available`)}`);
             break;
           }
 

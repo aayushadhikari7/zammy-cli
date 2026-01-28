@@ -171,6 +171,51 @@ async function inspectContainer(
   }
 }
 
+async function startContainer(
+  shell: NonNullable<PluginAPI['shell']>,
+  container: string
+): Promise<{ success: boolean; error?: string }> {
+  const result = await shell.spawn('docker', ['start', container]);
+  if (result.code !== 0) {
+    return { success: false, error: result.stderr || 'Failed to start container' };
+  }
+  return { success: true };
+}
+
+async function stopContainer(
+  shell: NonNullable<PluginAPI['shell']>,
+  container: string
+): Promise<{ success: boolean; error?: string }> {
+  const result = await shell.spawn('docker', ['stop', container]);
+  if (result.code !== 0) {
+    return { success: false, error: result.stderr || 'Failed to stop container' };
+  }
+  return { success: true };
+}
+
+async function restartContainer(
+  shell: NonNullable<PluginAPI['shell']>,
+  container: string
+): Promise<{ success: boolean; error?: string }> {
+  const result = await shell.spawn('docker', ['restart', container]);
+  if (result.code !== 0) {
+    return { success: false, error: result.stderr || 'Failed to restart container' };
+  }
+  return { success: true };
+}
+
+async function execInContainer(
+  shell: NonNullable<PluginAPI['shell']>,
+  container: string,
+  command: string[]
+): Promise<{ output: string; error?: string }> {
+  const result = await shell.spawn('docker', ['exec', container, ...command]);
+  if (result.code !== 0) {
+    return { output: '', error: result.stderr || 'Command failed' };
+  }
+  return { output: result.stdout };
+}
+
 async function pruneDocker(
   shell: NonNullable<PluginAPI['shell']>,
   options: { all?: boolean; volumes?: boolean }
@@ -264,7 +309,11 @@ const plugin: ZammyPlugin = {
           console.log(`  ${theme.dim('Actions:')}`);
           console.log(`    ${theme.primary('ps')}               ${theme.dim('List containers (use -a for all)')}`);
           console.log(`    ${theme.primary('images')}           ${theme.dim('List images')}`);
+          console.log(`    ${theme.primary('start <id>')}       ${theme.dim('Start a container')}`);
+          console.log(`    ${theme.primary('stop <id>')}        ${theme.dim('Stop a container')}`);
+          console.log(`    ${theme.primary('restart <id>')}     ${theme.dim('Restart a container')}`);
           console.log(`    ${theme.primary('logs <id>')}        ${theme.dim('View container logs')}`);
+          console.log(`    ${theme.primary('exec <id> <cmd>')}  ${theme.dim('Run command in container')}`);
           console.log(`    ${theme.primary('stats')}            ${theme.dim('Show resource usage')}`);
           console.log(`    ${theme.primary('prune')}            ${theme.dim('Clean up unused resources')}`);
           console.log(`    ${theme.primary('inspect <id>')}     ${theme.dim('Show container details')}`);
@@ -337,6 +386,70 @@ const plugin: ZammyPlugin = {
 
               console.log('');
               console.log(`  ${theme.dim(`Total: ${images.length} images`)}`);
+            }
+            break;
+          }
+
+          case 'start': {
+            const container = args[1];
+            if (!container) {
+              console.log(`  ${symbols.warning} ${theme.warning('Usage:')} /docker start <container-id>`);
+              break;
+            }
+            const startResult = await startContainer(shell, container);
+            if (startResult.success) {
+              console.log(`  ${symbols.check} ${theme.success('Container started:')} ${theme.primary(container)}`);
+            } else {
+              console.log(`  ${symbols.cross} ${theme.error(startResult.error || 'Failed to start')}`);
+            }
+            break;
+          }
+
+          case 'stop': {
+            const container = args[1];
+            if (!container) {
+              console.log(`  ${symbols.warning} ${theme.warning('Usage:')} /docker stop <container-id>`);
+              break;
+            }
+            console.log(`  ${theme.dim('Stopping container...')}`);
+            const stopResult = await stopContainer(shell, container);
+            if (stopResult.success) {
+              console.log(`  ${symbols.check} ${theme.success('Container stopped:')} ${theme.primary(container)}`);
+            } else {
+              console.log(`  ${symbols.cross} ${theme.error(stopResult.error || 'Failed to stop')}`);
+            }
+            break;
+          }
+
+          case 'restart': {
+            const container = args[1];
+            if (!container) {
+              console.log(`  ${symbols.warning} ${theme.warning('Usage:')} /docker restart <container-id>`);
+              break;
+            }
+            console.log(`  ${theme.dim('Restarting container...')}`);
+            const restartResult = await restartContainer(shell, container);
+            if (restartResult.success) {
+              console.log(`  ${symbols.check} ${theme.success('Container restarted:')} ${theme.primary(container)}`);
+            } else {
+              console.log(`  ${symbols.cross} ${theme.error(restartResult.error || 'Failed to restart')}`);
+            }
+            break;
+          }
+
+          case 'exec': {
+            const container = args[1];
+            const cmd = args.slice(2);
+            if (!container || cmd.length === 0) {
+              console.log(`  ${symbols.warning} ${theme.warning('Usage:')} /docker exec <container-id> <command>`);
+              console.log(`  ${theme.dim('Example:')} /docker exec myapp sh -c "ls -la"`);
+              break;
+            }
+            const execResult = await execInContainer(shell, container, cmd);
+            if (execResult.error) {
+              console.log(`  ${symbols.cross} ${theme.error(execResult.error)}`);
+            } else {
+              console.log(execResult.output);
             }
             break;
           }

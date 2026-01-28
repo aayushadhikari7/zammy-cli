@@ -1,6 +1,6 @@
 {
   "name": "zammy-plugin-network",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "displayName": "Network Tools",
   "description": "Network utilities and diagnostics",
   "author": "Zammy CLI",

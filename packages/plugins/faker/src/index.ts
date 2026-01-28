@@ -231,6 +231,72 @@ function generateLorem(sentences: number = 3): string {
   return result.join(' ');
 }
 
+function generatePassword(length: number = 16): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return password;
+}
+
+function generateUsername(): string {
+  const adjectives = ['happy', 'clever', 'swift', 'bright', 'cool', 'epic', 'mega', 'super', 'ultra', 'pro'];
+  const nouns = ['coder', 'ninja', 'wizard', 'hacker', 'dev', 'guru', 'master', 'legend', 'hero', 'star'];
+  const adj = randomItem(adjectives);
+  const noun = randomItem(nouns);
+  const num = randomInt(1, 999);
+  return `${adj}_${noun}${num}`;
+}
+
+function generateIP(): { v4: string; v6: string } {
+  const v4 = `${randomInt(1, 255)}.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 254)}`;
+  const v6Segments = Array.from({ length: 8 }, () =>
+    randomInt(0, 65535).toString(16).padStart(4, '0')
+  );
+  return { v4, v6: v6Segments.join(':') };
+}
+
+function generateColor(): { hex: string; rgb: string; hsl: string } {
+  const r = randomInt(0, 255);
+  const g = randomInt(0, 255);
+  const b = randomInt(0, 255);
+  const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+  // Convert to HSL
+  const rNorm = r / 255, gNorm = g / 255, bNorm = b / 255;
+  const max = Math.max(rNorm, gNorm, bNorm), min = Math.min(rNorm, gNorm, bNorm);
+  const l = (max + min) / 2;
+  let h = 0, s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === rNorm) h = ((gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0)) / 6;
+    else if (max === gNorm) h = ((bNorm - rNorm) / d + 2) / 6;
+    else h = ((rNorm - gNorm) / d + 4) / 6;
+  }
+
+  return {
+    hex,
+    rgb: `rgb(${r}, ${g}, ${b})`,
+    hsl: `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
+  };
+}
+
+function generateUrl(): string {
+  const protocols = ['https'];
+  const tlds = ['com', 'io', 'dev', 'app', 'net', 'org'];
+  const words = ['app', 'web', 'api', 'data', 'cloud', 'tech', 'code', 'dev', 'hub', 'lab'];
+
+  const protocol = randomItem(protocols);
+  const subdomain = Math.random() > 0.5 ? `${randomItem(words)}.` : '';
+  const domain = randomItem(words) + randomItem(words);
+  const tld = randomItem(tlds);
+  const path = Math.random() > 0.5 ? `/${randomItem(words)}` : '';
+
+  return `${protocol}://${subdomain}${domain}.${tld}${path}`;
+}
+
 function generateJson(template: string): string {
   const replacements: Record<string, () => string> = {
     '{{name}}': () => generateName().fullName,
@@ -289,6 +355,11 @@ const plugin: ZammyPlugin = {
           console.log(`    ${theme.primary('date')}      ${theme.dim('Random date')}`);
           console.log(`    ${theme.primary('lorem')}     ${theme.dim('Lorem ipsum text')}`);
           console.log(`    ${theme.primary('json')}      ${theme.dim('JSON with placeholders')}`);
+          console.log(`    ${theme.primary('password')} ${theme.dim('Random secure password')}`);
+          console.log(`    ${theme.primary('username')} ${theme.dim('Random username')}`);
+          console.log(`    ${theme.primary('ip')}       ${theme.dim('Random IP addresses')}`);
+          console.log(`    ${theme.primary('color')}    ${theme.dim('Random color (hex/rgb/hsl)')}`);
+          console.log(`    ${theme.primary('url')}      ${theme.dim('Random URL')}`);
           console.log('');
           return;
         }
@@ -397,6 +468,43 @@ const plugin: ZammyPlugin = {
             } catch {
               console.log(`  ${symbols.cross} ${theme.error('Invalid JSON template')}`);
             }
+            break;
+          }
+
+          case 'password': {
+            const length = parseInt(args[1]) || 16;
+            const password = generatePassword(length);
+            console.log(`  ${symbols.check} ${theme.success('Password:')} ${theme.primary(password)}`);
+            console.log(`  ${theme.dim(`Length: ${length} characters`)}`);
+            break;
+          }
+
+          case 'username': {
+            const username = generateUsername();
+            console.log(`  ${symbols.check} ${theme.success('Username:')} ${theme.primary(username)}`);
+            break;
+          }
+
+          case 'ip': {
+            const ip = generateIP();
+            console.log(`  ${symbols.check} ${theme.success('IP Addresses:')}`);
+            console.log(`  ${theme.dim('IPv4:')} ${theme.primary(ip.v4)}`);
+            console.log(`  ${theme.dim('IPv6:')} ${theme.primary(ip.v6)}`);
+            break;
+          }
+
+          case 'color': {
+            const color = generateColor();
+            console.log(`  ${symbols.check} ${theme.success('Color:')}`);
+            console.log(`  ${theme.dim('Hex:')} ${theme.primary(color.hex)}`);
+            console.log(`  ${theme.dim('RGB:')} ${color.rgb}`);
+            console.log(`  ${theme.dim('HSL:')} ${color.hsl}`);
+            break;
+          }
+
+          case 'url': {
+            const url = generateUrl();
+            console.log(`  ${symbols.check} ${theme.success('URL:')} ${theme.primary(url)}`);
             break;
           }
 

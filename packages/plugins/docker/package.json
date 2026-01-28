@@ -1,6 +1,6 @@
 {
   "name": "zammy-plugin-docker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Docker container management with pretty output",
   "type": "module",
   "main": "dist/index.js",

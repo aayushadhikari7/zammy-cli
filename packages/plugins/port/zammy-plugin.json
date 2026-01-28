@@ -1,6 +1,6 @@
 {
   "name": "zammy-plugin-port",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "displayName": "Port Manager",
   "description": "Manage ports and processes",
   "author": "Zammy CLI",

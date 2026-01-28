@@ -1,6 +1,6 @@
 {
   "name": "zammy-plugin-port",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Manage ports and processes",
   "type": "module",
   "main": "dist/index.js",

@@ -1,6 +1,6 @@
 {
   "name": "zammy-plugin-http-mock",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Mock HTTP responses for API testing",
   "type": "module",
   "main": "./dist/index.js",
