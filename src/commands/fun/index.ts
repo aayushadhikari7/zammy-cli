@@ -6,3 +6,4 @@ import './dice.js';
 import './flip.js';
 import './pomodoro.js';
 import './zammy.js';
+import './motivate.js';
