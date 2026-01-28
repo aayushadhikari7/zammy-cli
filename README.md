@@ -161,6 +161,9 @@ Everything is styled with colors, icons, and proper formatting:
 | `/datetime` | Timezone conversions, date math, formatting |
 | `/text` | Text processing (sort, uniq, upper, lower, replace) |
 | `/envfile` | Manage .env files (get, set, diff, template) |
+| `/snippet` | Save and manage code snippets |
+| `/monitor` | Live system resource monitor |
+| `/ssh` | Manage SSH keys (list, generate, copy) |
 | `/exit` | Exit Zammy |
 
 ### Developer Tools
@@ -177,6 +180,7 @@ Everything is styled with colors, icons, and proper formatting:
 | `/regex <pattern> <input>` | Test regex patterns with match highlighting |
 | `/cron <expression>` | Parse cron expressions, show next runs |
 | `/changelog` | Generate changelog from git commits |
+| `/scaffold` | Create projects from templates (node-cli, ts-lib, express-api) |
 
 ### Fun
 
@@ -196,9 +200,10 @@ Everything is styled with colors, icons, and proper formatting:
 | Command | Description |
 |---------|-------------|
 | `/asciiart @<image>` | Convert images to ASCII art |
-| `/figlet <text>` | Generate ASCII text art |
+| `/figlet <text>` | ASCII text art with gradients & animation |
 | `/lorem [n]` | Lorem ipsum generator |
 | `/color <hex>` | Color converter & preview |
+| `/md <file>` | Render markdown in terminal |
 
 ### Info
 
@@ -276,6 +281,8 @@ Zammy is extensible through plugins. Install community plugins or create your ow
 | **Port Manager** | `/plugin install zammy-plugin-port` | List, check, and kill processes by port |
 | **Network Tools** | `/plugin install zammy-plugin-network` | IP lookup, ping, DNS, speed test |
 | **Docker** | `/plugin install zammy-plugin-docker` | Manage containers with pretty output |
+| **Quiz** | `/plugin install zammy-plugin-quiz` | Test your dev knowledge (git, http, js, regex) |
+| **HTTP Mock** | `/plugin install zammy-plugin-http-mock` | Mock HTTP server for API testing |
 
 ### Creating a Plugin
 
