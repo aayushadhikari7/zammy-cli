@@ -16,3 +16,4 @@ import './alias.js';
 import './datetime.js';
 import './text.js';
 import './envfile.js';
+import './snippet.js';
