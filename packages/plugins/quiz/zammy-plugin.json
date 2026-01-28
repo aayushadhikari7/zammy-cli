@@ -1,0 +1,14 @@
+{
+  "name": "zammy-plugin-quiz",
+  "version": "1.0.0",
+  "displayName": "Quiz",
+  "description": "Test your developer knowledge with interactive quizzes",
+  "author": "Zammy CLI",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "commands": ["quiz"],
+  "zammy": {
+    "minVersion": "1.3.0"
+  },
+  "permissions": {}
+}
