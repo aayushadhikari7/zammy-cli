@@ -9,3 +9,4 @@ import './base.js';
 import './regex.js';
 import './cron.js';
 import './changelog.js';
+import './scaffold.js';
