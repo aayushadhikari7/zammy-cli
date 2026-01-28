@@ -7,6 +7,7 @@ import { existsSync, statSync, readFileSync, readdirSync, writeFileSync, watchFi
 import { resolve, extname, basename, join } from 'path';
 import { homedir, platform, networkInterfaces } from 'os';
 import chalk from 'chalk';
+import { expandAlias, getAllAliases, addAlias, removeAlias, getAlias } from './handlers/utilities/alias.js';
 
 const isWindows = platform() === 'win32';
 
@@ -1312,29 +1313,12 @@ function handleDiff(args: string): void {
   console.log('');
 }
 
-// Command aliases storage
-const aliasesFile = join(homedir(), '.zammy-aliases.json');
-
-function loadAliases(): Record<string, string> {
-  try {
-    if (existsSync(aliasesFile)) {
-      return JSON.parse(readFileSync(aliasesFile, 'utf-8'));
-    }
-  } catch {}
-  return {};
-}
-
-function saveAliases(aliases: Record<string, string>): void {
-  writeFileSync(aliasesFile, JSON.stringify(aliases, null, 2));
-}
-
-function handleAlias(args: string): void {
+// Shell alias handler - uses persistent alias system
+function handleShellAlias(args: string): void {
   const parts = args.trim().split(/\s+/);
   const action = parts[0]?.toLowerCase();
   const name = parts[1];
   const command = parts.slice(2).join(' ');
-
-  const aliases = loadAliases();
 
   console.log('');
 
@@ -1342,24 +1326,31 @@ function handleAlias(args: string): void {
     if (!name || !command) {
       console.log(theme.error('  Usage: alias add <name> <command>'));
     } else {
-      aliases[name] = command;
-      saveAliases(aliases);
-      console.log(`  ${symbols.check} ${theme.success('Alias created:')} ${theme.primary(name)} ${theme.dim('→')} ${command}`);
+      const result = addAlias(name, command, 'shell');
+      if (result.success) {
+        console.log(`  ${symbols.check} ${theme.success('Alias created:')} ${theme.primary(name)} ${theme.dim('→')} ${command}`);
+      } else {
+        console.log(theme.error(`  ${result.error}`));
+      }
     }
-  } else if (action === 'del' || action === 'rm') {
-    if (!name || !aliases[name]) {
-      console.log(theme.error(`  Alias not found: ${name}`));
+  } else if (action === 'del' || action === 'rm' || action === 'remove') {
+    if (!name) {
+      console.log(theme.error('  Usage: alias remove <name>'));
     } else {
-      delete aliases[name];
-      saveAliases(aliases);
-      console.log(`  ${symbols.check} ${theme.success('Alias deleted:')} ${theme.primary(name)}`);
+      const result = removeAlias(name);
+      if (result.success) {
+        console.log(`  ${symbols.check} ${theme.success('Alias deleted:')} ${theme.primary(name)}`);
+      } else {
+        console.log(theme.error(`  ${result.error}`));
+      }
     }
   } else if (action === 'run' && name) {
-    if (aliases[name]) {
-      console.log(theme.dim(`  Running: ${aliases[name]}`));
+    const alias = getAlias(name);
+    if (alias) {
+      console.log(theme.dim(`  Running: ${alias.command}`));
       console.log('');
       try {
-        const result = execSync(aliases[name], { encoding: 'utf-8', cwd: process.cwd(), timeout: 30000 });
+        const result = execSync(alias.command, { encoding: 'utf-8', cwd: process.cwd(), timeout: 30000 });
         console.log(result);
       } catch (error: unknown) {
         const err = error as { stderr?: string; killed?: boolean };
@@ -1374,15 +1365,16 @@ function handleAlias(args: string): void {
     }
   } else {
     // List aliases
-    const keys = Object.keys(aliases);
-    if (keys.length === 0) {
-      console.log(theme.dim('  No aliases defined'));
+    const aliases = getAllAliases().filter(a => a.type === 'shell');
+    if (aliases.length === 0) {
+      console.log(theme.dim('  No shell aliases defined'));
       console.log(theme.dim('  Use "alias add <name> <command>" to create one'));
+      console.log(theme.dim('  Or use /alias for the full alias manager'));
     } else {
-      console.log(theme.primary('  ⚡ Command Aliases'));
+      console.log(theme.primary('  ⚡ Shell Aliases'));
       console.log('');
-      for (const key of keys.sort()) {
-        console.log(`  ${theme.primary(key.padEnd(15))} ${theme.dim('→')} ${aliases[key]}`);
+      for (const alias of aliases) {
+        console.log(`  ${theme.primary(alias.name.padEnd(15))} ${theme.dim('→')} ${alias.command}`);
       }
     }
   }
@@ -1600,6 +1592,13 @@ function handleHead(args: string): void {
 }
 
 async function executeShellCommand(command: string): Promise<void> {
+  // Expand aliases for shell commands
+  const { expanded, wasExpanded, alias } = expandAlias(command);
+  if (wasExpanded && alias?.type === 'shell') {
+    console.log(theme.dim(`  → ${expanded}`));
+    command = expanded;
+  }
+
   const parts = command.trim().split(/\s+/);
   const cmd = parts[0].toLowerCase();
   const args = parts.slice(1).join(' ');
@@ -1710,7 +1709,7 @@ async function executeShellCommand(command: string): Promise<void> {
   }
 
   if (cmd === 'alias') {
-    handleAlias(args);
+    handleShellAlias(args);
     return;
   }
 

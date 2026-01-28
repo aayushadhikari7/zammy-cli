@@ -11,3 +11,5 @@ import './todo.js';
 import './history.js';
 import './env.js';
 import './size.js';
+import './config.js';
+import './alias.js';

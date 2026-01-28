@@ -183,6 +183,9 @@ import './commands/index.js';
 // Import plugin loader
 import { initPluginLoader } from './plugins/loader.js';
 
+// Import config loader
+import { loadConfig } from './config/loader.js';
+
 // Image extensions for asciiart autocomplete
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'];
 
@@ -487,6 +490,9 @@ function completer(line: string): [string[], string] {
 }
 
 async function main() {
+  // Load configuration first
+  loadConfig();
+
   // Show simple mode notice if not TTY
   if (isSimpleMode && !process.argv.includes('--simple')) {
     console.log(theme.dim('Note: Running in simple mode (no TTY detected). Use Tab for autocomplete.'));
