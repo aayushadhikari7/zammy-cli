@@ -18,3 +18,4 @@ import './text.js';
 import './envfile.js';
 import './snippet.js';
 import './monitor.js';
+import './ssh.js';
