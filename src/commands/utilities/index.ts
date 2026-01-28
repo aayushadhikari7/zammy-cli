@@ -13,3 +13,4 @@ import './env.js';
 import './size.js';
 import './config.js';
 import './alias.js';
+import './datetime.js';
