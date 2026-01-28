@@ -156,6 +156,11 @@ Everything is styled with colors, icons, and proper formatting:
 | `/history` | Command history |
 | `/env [name]` | View environment variables |
 | `/size [path]` | Analyze file/folder sizes |
+| `/config` | Manage settings (show, set, reset, edit) |
+| `/alias` | Persistent command aliases (add, remove, list) |
+| `/datetime` | Timezone conversions, date math, formatting |
+| `/text` | Text processing (sort, uniq, upper, lower, replace) |
+| `/envfile` | Manage .env files (get, set, diff, template) |
 | `/exit` | Exit Zammy |
 
 ### Developer Tools
@@ -168,6 +173,10 @@ Everything is styled with colors, icons, and proper formatting:
 | `/json <action>` | JSON tools (validate, format, query) |
 | `/request <method> <url>` | Make HTTP requests (no curl needed) |
 | `/diff <file1> <file2>` | Compare two files |
+| `/base <number>` | Convert between binary, octal, decimal, hex |
+| `/regex <pattern> <input>` | Test regex patterns with match highlighting |
+| `/cron <expression>` | Parse cron expressions, show next runs |
+| `/changelog` | Generate changelog from git commits |
 
 ### Fun
 
@@ -180,6 +189,7 @@ Everything is styled with colors, icons, and proper formatting:
 | `/dice [n] [sides]` | Roll dice with ASCII art |
 | `/flip [count]` | Flip coins |
 | `/pomodoro` | 25/5 Pomodoro timer |
+| `/motivate` | Programming quotes, tips & affirmations |
 
 ### Creative
 
