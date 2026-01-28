@@ -1,0 +1,16 @@
+{
+  "name": "zammy-plugin-http-mock",
+  "version": "1.0.0",
+  "displayName": "HTTP Mock",
+  "description": "Mock HTTP responses for API testing",
+  "author": "Zammy CLI",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "commands": ["mock"],
+  "zammy": {
+    "minVersion": "1.3.0"
+  },
+  "permissions": {
+    "network": true
+  }
+}
